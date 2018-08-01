@@ -43,6 +43,7 @@ if (!$emailCheck && !$passwordCheck) {
     $db_port = '3306';
     echo "pw" . $pw;
     echo "email" . $email;
+    echo "formroles" . $email;
 
     $connection = mysqli_connect($host, $username, $password, $db, $db_port);
     if ($connection->connect_error) {
@@ -54,13 +55,36 @@ if (!$emailCheck && !$passwordCheck) {
         $sql->store_result();
         $rowNum = $sql->num_rows;
 
-
         if ($rowNum == 1) {
-            header('Location:EmployeeDashboard.php');
-        } else {
-            $badLogin = "Can't Login. Renter Credentials";
-        }
+            //SELECT department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = "ronn.pang@gmail.com";
 
+            $sql = $connection->prepare("SELECT employee.department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = ?");
+            $sql->bind_param("s", $email);
+            $sql->execute();
+            $sql->bind_result($out);
+            $sql->fetch();
+
+            if ($out == 7) {
+                header('Location:EmployeeDashboard.php');
+                exit();
+            }
+            else if ($out == 1) {
+                header('Location:ManagerDashboard.php');
+                exit();
+            }
+            else if ($out == 13) {
+                header('Location:AdminDashboard.php');
+                exit();
+            }
+            else if ($out == 14) {
+                header('Location:SalesDashboard.php');
+                exit();
+            }
+            else {
+                $badLogin = "Can't Login. Renter Credentials";
+            }
+
+        }
     }
     ob_flush();
 }

@@ -44,7 +44,7 @@ if (!$fNameCheck && !$lNameCheck && !$emailCheck && !$passwordCheck) {
     $_COOKIE['lName'] = $_POST["lName"];
     $_COOKIE['email'] = $_POST["email"];
     $_COOKIE['password'] = $_POST["password"];
-    Register($_POST["fName"], $_POST["lName"], $_POST["email"], $_POST["password"]);
+    Register($_POST["fName"], $_POST["lName"], $_POST["email"], $_POST["password"], $_POST["formRoles"]);
     header('Location:Login.php');
 }
 ob_flush();
@@ -74,6 +74,15 @@ ob_flush();
     <div class="form-group">
         <label for="password">Password</label>
         <input name="password" type="password" , id="password" placeholder="Enter Password">
+    </div>
+
+    <div class="form-group">
+        <select name ="formRoles">
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+            <option value="salesAssociate">Sales Associate</option>
+            <option value="admin">Admin</option>
+        </select>
     </div>
 
     <button type="submit" class="btn btn-primary"> Register</button>
