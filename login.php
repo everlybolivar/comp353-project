@@ -33,8 +33,7 @@ if ($passwordCheck) {
 if (!$emailCheck && !$passwordCheck) {
     $pw = $_POST["password"];
     $email = $_POST["email"];
-    $_COOKIE['email'] = $_POST["email"];
-    $_COOKIE['password'] = $_POST["password"];
+    setcookie("email", $email, time() + (86400 * 30));
 
     $host = 'ddc353.encs.concordia.ca';
     $username = 'ddc353_1';
