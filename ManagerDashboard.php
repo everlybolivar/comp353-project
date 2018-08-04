@@ -13,79 +13,75 @@ ob_start();  //begin buffering the output
 
     <style>
 
-        .sidebar{
-            width:250px;
-            background-color:#7386D5;
-            height:100%;
-            position:fixed;
-            float:left;
-            z-index:2;
-            top:0px;
-            left:0px;
+        .sidebar {
+            width: 250px;
+            background-color: #7386D5;
+            height: 100%;
+            position: fixed;
+            float: left;
+            z-index: 2;
+            top: 0px;
+            left: 0px;
         }
 
-        .lielement a{
-            diplay:block;
+        .lielement a {
+            diplay: block;
             font-family: 'Poppins', sans-serif;
-            color:#fff;
+            color: #fff;
             font-size: 1.1em;
             font-weight: 300;
             line-height: 1.7em;
-            margin:10px;
-            padding:10px;
-            font-weight:400;
-            text-decoration:none !important;
+            margin: 10px;
+            padding: 10px;
+            font-weight: 400;
+            text-decoration: none !important;
         }
 
-        .title{
-            margin-top:10px;
+        .title {
+            margin-top: 10px;
             font-size: 2.1em;
             font-family: 'Poppins', sans-serif;
             line-height: 1.7em;
             font-weight: 300;
-            text-align:center;
-            color:#fff;
+            text-align: center;
+            color: #fff;
         }
-        #content{
-            margin-top:25px;
-            margin-left:25%;
+
+        #content {
+            margin-top: 25px;
+            margin-left: 25%;
         }
 
     </style>
 
-        </head>
+</head>
 
 
 <body>
 <!---->
 <?php
+require 'DB.php';
 //validation
 
-    $email = $_COOKIE['email'];
-    $host = 'ddc353.encs.concordia.ca';
-    $username = 'ddc353_1';
-    $password = '353DBpro';
-    $db = 'ddc353_1';
-    $db_port = '3306';
+$connection = DB::getConnection();
 
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
-    if ($connection->connect_error) {
-        die("error failure" . $connection->connect_error);
-    } else {
-        $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name 
+if ($connection->connect_error) {
+    die("error failure" . $connection->connect_error);
+} else {
+    $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name 
                                      FROM users 
                                      INNER JOIN contract ON contract.responsible_person_id = users.employee_id 
                                      INNER JOIN employee ON employee.manager_id = contract.responsible_person_id 
                                      WHERE users.email = ?");
-        $sql->bind_param("s", $email);
-        $sql->execute();
-        $result = $sql->get_result();
-        while($row = $result->fetch_assoc()){
-            echo $row['employee_fname'];
-        }
-
+    $sql->bind_param("s", $email);
+    $sql->execute();
+    $result = $sql->get_result();
+    while ($row = $result->fetch_assoc()) {
+        echo $row['employee_fname'];
     }
-    ob_flush();
+
+}
+ob_flush();
 
 ?>
 

@@ -17,20 +17,13 @@ ob_start();  //begin buffering the output
 <body>
 
 <?php
+require 'DB.php';
 //validation
 $badLogin = "";
 $fName = $lName = $email = $password = "";
 $username = $_cookie["email"];
 
-
-$host = 'ddc353.encs.concordia.ca';
-$username = 'ddc353_1';
-$password = '353DBpro';
-$db = 'ddc353_1';
-$db_port = '3306';
-
-
-$connection = mysqli_connect($host, $username, $password, $db, $db_port);
+$connection = DB::getConnection();
 if ($connection->connect_error) {
     die("error failure" . $connection->connect_error);
 } else {

@@ -17,6 +17,7 @@ ob_start();  //begin buffering the output
 <body>
 
 <?php
+require 'DB.php';
 //validation
 $badLogin = "";
 $fName = $lName = $email = $password = "";
@@ -35,16 +36,11 @@ if (!$emailCheck && !$passwordCheck) {
     $email = $_POST["email"];
     setcookie("email", $email, time() + (86400 * 30));
 
-    $host = 'ddc353.encs.concordia.ca';
-    $username = 'ddc353_1';
-    $password = '353DBpro';
-    $db = 'ddc353_1';
-    $db_port = '3306';
     echo "pw" . $pw;
     echo "email" . $email;
     echo "formroles" . $email;
 
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
@@ -66,20 +62,16 @@ if (!$emailCheck && !$passwordCheck) {
             if ($out == 7) {
                 header('Location:EmployeeDashboard.php');
                 exit();
-            }
-            else if ($out == 1) {
+            } else if ($out == 1) {
                 header('Location:ManagerDashboard.php');
                 exit();
-            }
-            else if ($out == 13) {
+            } else if ($out == 13) {
                 header('Location:AdminDashboard.php');
                 exit();
-            }
-            else if ($out == 14) {
+            } else if ($out == 14) {
                 header('Location:SalesDashboard.php');
                 exit();
-            }
-            else {
+            } else {
                 $badLogin = "Can't Login. Renter Credentials";
             }
 
