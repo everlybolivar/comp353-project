@@ -61,6 +61,65 @@ ob_start();  //begin buffering the output
 <?php
 //validation
 
+
+
+
+if (isset($_POST['eid'])){
+    $eid = $_POST['eid'];
+    $host = 'ddc353.encs.concordia.ca';
+    $username = 'ddc353_1';
+    $password = '353DBpro';
+    $db = 'ddc353_1';
+    $db_port = '3306';
+
+    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+
+    if ($connection->connect_error) {
+        die("error failure" . $connection->connect_error);
+    } else {
+        $sql3 = $connection->prepare("UPDATE employee SET contract_id = NULL where employee_id = ?");
+        $sql3->bind_param("s", $eid);
+        $sql3->execute();
+    }
+
+    $sql3->close();
+    Header('Location: '.$_SERVER['PHP_SELF']);
+    Exit();
+
+}
+
+
+function updateList(){
+
+
+$email = $_COOKIE['email'];
+$host = 'ddc353.encs.concordia.ca';
+$username = 'ddc353_1';
+$password = '353DBpro';
+$db = 'ddc353_1';
+$db_port = '3306';
+
+$connection = mysqli_connect($host, $username, $password, $db, $db_port);
+if ($connection->connect_error) {
+    die("error failure" . $connection->connect_error);
+} else {
+    $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name  FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.manager_id = contract.responsible_person_id && employee.contract_id = contract.contract_id WHERE users.email = ?");
+    $sql->bind_param("s", $email);
+    $sql->execute();
+    $result = $sql->get_result();
+    $rowNum = $sql->num_rows;
+
+}
+}
+
+
+
+
+
+
+
+
+
     $email = $_COOKIE['email'];
     $host = 'ddc353.encs.concordia.ca';
     $username = 'ddc353_1';
@@ -72,43 +131,117 @@ ob_start();  //begin buffering the output
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
-        $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name 
-                                     FROM users 
-                                     INNER JOIN contract ON contract.responsible_person_id = users.employee_id 
-                                     INNER JOIN employee ON employee.manager_id = contract.responsible_person_id 
-                                     WHERE users.email = ?");
+
+        $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id WHERE users.email = ?");
+        $sql1->bind_param("s", $email);
+        $sql1->execute();
+        $sql1->bind_result($contractname,$contractid);
+        $sql1->fetch();
+        $sql1->close();
+
+
+
+        $sql2 = $connection->prepare("SELECT employee.employee_fname,employee.employee_fname,employee.employee_id FROM users INNER JOIN employee ON employee.manager_id = users.employee_id WHERE users.email = ?");
+        $sql2->bind_param("s", $email);
+        $sql2->execute();
+        $resultEmployee = $sql2->get_result();
+        $sql2->close();
+
+
+        $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name  FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.manager_id = contract.responsible_person_id && employee.contract_id = contract.contract_id WHERE users.email = ?");
         $sql->bind_param("s", $email);
         $sql->execute();
         $result = $sql->get_result();
-        while($row = $result->fetch_assoc()){
-            echo $row['employee_fname'];
-        }
+        $rowNum = $sql->num_rows;
+//        $row = $result->fetch_assoc();
+//        while($row = $result->fetch_assoc()){
+//            echo $row['employee_fname'];
+//        }
+
+
 
     }
-    ob_flush();
+
+
+if (isset($_POST['addEid'])){
+    $addEid = $_POST['addEid'];
+    $host = 'ddc353.encs.concordia.ca';
+    $username = 'ddc353_1';
+    $password = '353DBpro';
+    $db = 'ddc353_1';
+    $db_port = '3306';
+    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+
+    if ($connection->connect_error) {
+        die("error failure" . $connection->connect_error);
+    } else {
+        echo "cid" . $contractid. $addEid ;
+        $sql4 = $connection->prepare("UPDATE employee SET contract_id = ? WHERE employee_id = ?");
+        $sql4->bind_param("ss",$contractid, $addEid);
+        $sql4->execute();
+        Header('Location: '.$_SERVER['PHP_SELF']);
+        Exit();
+    }
+
+    $sql4->close();
+
+}
+
+
+
+$sql->close();
+
+ob_flush();
 
 ?>
 
+
+<!--<div class="sidebar">-->
+<!--    <div class="title">CMS</div>-->
+<!--    <div class="lielement"> <a>test</a></div>-->
+<!--    <div class="lielement"><a>test2</a></div>-->
 <!---->
-<!--<div class="sidebar"></div>-->
-<!---->
-<!---->
-<!--<form method="post" action="--><?php //echo htmlspecialchars($_SERVER["PHP_SELF"]); ?><!--">-->
-<!--    <div class="sidebar">-->
-<!--        <div class="title">CMS</div>-->
-<!--        <div class="lielement"> <a>test</a></div>-->
-<!--        <div class="lielement"><a>test2</a></div>-->
-<!---->
-<!--    </div>-->
-<!--    <div id ="content">-->
-<!--        <div class="form-group">-->
-<!--            <label for="email">Login Email:</label>-->
-<!--            <input type="email" , name="email" id="email" placeholder="Enter Email">-->
-<!--        </div>-->
-<!--    </div>-->
-<!---->
-<!---->
-<!--</form>-->
+<!--</div>-->
+<div id ="content">
+    <div class="form-group">
+    <div class="card" style="width: 25rem;">
+        <div class="card-header">
+            <?php echo $contractname ?>
+        </div>
+        <ul class="list-group list-group-flush">
+            <?php while($row = $result->fetch_assoc()){ ?>
+            <li class="list-group-item">
+                <div class="row">
+                <div class="col-sm-6">
+                <?php echo $row['employee_fname'] . $row['employee_lname']?>
+                </div>
+                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                    <div class="col-sm-6">
+                    <input type='hidden' name='eid' value = <?php echo $row['employee_id']?> >
+                    <button  type="submit" class="btn btn-primary"> Remove</button>
+                    </div>
+                    </form>
+
+                </div>
+            </li>
+             <?php } ?>
+
+
+        </ul>
+
+
+    </div>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <select name="addEid" >
+                <?php while($row2 = $resultEmployee->fetch_assoc()){ ?>
+                    <option value = <? echo $row2['employee_id']?> > <?echo $row2['employee_id']. " " . $row2['employee_lname']?> </option>
+                <?php } ?>
+            </select>
+            <button  type="submit" class="btn btn-primary"> Add employees</button>
+        </form>
+
+    </div>
+</div>
 
 
 </body>
