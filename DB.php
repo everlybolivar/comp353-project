@@ -34,19 +34,17 @@ class db extends mysqli
         if ($connection->connect_error) {
             die("error failure" . $connection->connect_error);
         }
+        $connection->query($query);
+    }
+
+    public function getResult($query)
+    {
+        $connection = mysqli_connect($this->host, $this->username, $this->password, $this->db, $this->db_port);
+        if ($connection->connect_error) {
+            die("error failure" . $connection->connect_error);
+        }
         $sql = $connection->query($query);
         $result = $sql->fetch_assoc();
         return $result;
-    }
-
-    public function get_result($query)
-    {
-        $result = $this->query($query);
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            return $row;
-        } else {
-            return null;
-        }
     }
 }
