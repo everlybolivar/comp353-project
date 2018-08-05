@@ -36,10 +36,6 @@ if (!$emailCheck && !$passwordCheck) {
     $email = $_POST["email"];
     setcookie("email", $email, time() + (86400 * 30));
 
-//    echo "pw" . $pw;
-//    echo "email" . $email;
-//    echo "formroles" . $email;
-
     $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);

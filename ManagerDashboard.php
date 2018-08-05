@@ -66,13 +66,8 @@ require 'DB.php';
 //removes employee from contract
 if (isset($_POST['eid'])) {
     $eid = $_POST['eid'];
-    $host = 'ddc353.encs.concordia.ca';
-    $username = 'ddc353_1';
-    $password = '353DBpro';
-    $db = 'ddc353_1';
-    $db_port = '3306';
 
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
 
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
@@ -91,13 +86,14 @@ if (isset($_POST['eid'])) {
 
 //read user email
 $email = $_COOKIE['email'];
-$host = 'ddc353.encs.concordia.ca';
-$username = 'ddc353_1';
-$password = '353DBpro';
-$db = 'ddc353_1';
-$db_port = '3306';
 
-$connection = mysqli_connect($host, $username, $password, $db, $db_port);
+// Redirect to login if no employee cookie
+if (!$email) {
+    header('Location:Login.php');
+}
+
+$connection = DB::getConnection();
+
 if ($connection->connect_error) {
     die("error failure" . $connection->connect_error);
 } else {
@@ -131,12 +127,7 @@ if ($connection->connect_error) {
 //Checks for employee to be added
 if (isset($_POST['addEid'])) {
     $addEid = $_POST['addEid'];
-    $host = 'ddc353.encs.concordia.ca';
-    $username = 'ddc353_1';
-    $password = '353DBpro';
-    $db = 'ddc353_1';
-    $db_port = '3306';
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
 
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
@@ -148,9 +139,6 @@ if (isset($_POST['addEid'])) {
         Header('Location: ' . $_SERVER['PHP_SELF']);
         Exit();
     }
-
-    $sql4->close();
-
 }
 
 
