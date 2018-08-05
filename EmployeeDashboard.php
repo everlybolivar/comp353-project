@@ -73,7 +73,7 @@ ob_flush();
             <h6>Contract Type: <?php echo $employee["employee_contract_type"] ?></h6>
         </div>
         <div class="row">
-            <h6>Current Contract: <?php echo $contract["company_name"] . " - " . $contract["contract_type"] ?></h6>
+            <h6>Current Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></h6>
         </div>
         <div class="row">
             <h6>Manager: <?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?></h6>

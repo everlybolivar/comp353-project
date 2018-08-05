@@ -43,8 +43,10 @@ class db extends mysqli
         if ($connection->connect_error) {
             die("error failure" . $connection->connect_error);
         }
-        $sql = $connection->query($query);
-        $result = $sql->fetch_assoc();
-        return $result;
+        $result = $connection->query($query);
+        if ($result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+        return null;
     }
 }
