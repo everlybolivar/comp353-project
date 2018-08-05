@@ -34,10 +34,9 @@ class db extends mysqli
         if ($connection->connect_error) {
             die("error failure" . $connection->connect_error);
         }
-        $sql = $connection->prepare($query);
-        $sql->execute();
-        $sql->store_result();
-        return $sql;
+        $sql = $connection->query($query);
+        $result = $sql->fetch_assoc();
+        return $result;
     }
 
     public function get_result($query)

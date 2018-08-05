@@ -36,19 +36,29 @@ if (!$emailCheck && !$passwordCheck) {
     $email = $_POST["email"];
     setcookie("email", $email, time() + (86400 * 30));
 
-    echo "pw" . $pw;
-    echo "email" . $email;
-    echo "formroles" . $email;
+//    echo "pw" . $pw;
+//    echo "email" . $email;
+//    echo "formroles" . $email;
 
     $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
-        $sql = $connection->prepare("SELECT * FROM users WHERE email = ? && password = ?");
+        $sql = $connection->prepare("SELECT employee_id FROM users WHERE email = ? && password = ?");
         $sql->bind_param("ss", $email, $pw);
+
+        // Execute query
         $sql->execute();
+
+        // Store result to get properties
         $sql->store_result();
         $rowNum = $sql->num_rows;
+
+        // Bind result to variable
+        $sql->bind_result($employeeID);
+
+        // Getting result
+        $sql->fetch();
 
         if ($rowNum == 1) {
             //SELECT department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = "ronn.pang@gmail.com";
@@ -57,9 +67,10 @@ if (!$emailCheck && !$passwordCheck) {
             $sql->bind_param("s", $email);
             $sql->execute();
             $sql->bind_result($out);
-            $sql->fetch();
+            $sql = $sql->fetch();
 
             if ($out == 7) {
+                setcookie("employeeID", $employeeID, time() + (86400 * 30));
                 header('Location:EmployeeDashboard.php');
                 exit();
             } else if ($out == 1) {
