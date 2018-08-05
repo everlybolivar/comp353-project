@@ -181,6 +181,7 @@ ob_flush();
                             <div class="col-sm-6">
                                 <?php echo $row['employee_fname'] . $row['employee_lname'] ?>
                             </div>
+                            <!--makes it so that this form posts back to itself. Refer to php forms-->
                             <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                 <div class="col-sm-6">
                                     <input type='hidden' name='eid' value= <?php echo $row['employee_id'] ?>>
