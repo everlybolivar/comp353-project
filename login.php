@@ -23,7 +23,7 @@ $badLogin = "";
 $fName = $lName = $email = $password = "";
 $emailCheck = empty($_POST["email"]);
 $passwordCheck = empty($_POST["password"]);
-
+//validation for empty passwords
 if ($emailCheck) {
     $emailEmpty = "Please enter your email";
 }
@@ -45,6 +45,7 @@ if (!$emailCheck && !$passwordCheck) {
         die("error failure" . $connection->connect_error);
     } else {
         $sql = $connection->prepare("SELECT employee_id FROM users WHERE email = ? && password = ?");
+        //bind params bind the email and pw to the question marks
         $sql->bind_param("ss", $email, $pw);
 
         // Execute query
@@ -59,16 +60,15 @@ if (!$emailCheck && !$passwordCheck) {
 
         // Getting result
         $sql->fetch();
-
+        //check to see if result returns more than one row
         if ($rowNum == 1) {
-            //SELECT department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = "ronn.pang@gmail.com";
 
             $sql = $connection->prepare("SELECT employee.department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = ?");
             $sql->bind_param("s", $email);
             $sql->execute();
             $sql->bind_result($out);
             $sql = $sql->fetch();
-
+            //out is the user type e.g admin,employee,manager etc. Refer to departments table
             if ($out == 7) {
                 setcookie("employeeID", $employeeID, time() + (86400 * 30));
                 header('Location:EmployeeDashboard.php');
