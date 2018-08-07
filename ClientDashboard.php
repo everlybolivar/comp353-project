@@ -26,62 +26,99 @@ ob_start();
 
     $query = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
     $client = DB::getInstance()->getResult($query);
-    $endDate = $client['service_end_date'];
+    
 
-    $query = "SELECT contract.contract_id, contract.contract_type, 
-    contract.service_type, contract.acv, contract.service_start_date, 
-    contract.service_end_date, employee.employee_fname, employee.employee_lname 
-    FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
-    WHERE contract.email_id = '$clientEmail'";
-    $result = mysqli_query($connection, $query);
+    function getAllContracts() {
+        $clientEmail = $_COOKIE['email'];
+        $query = "SELECT contract.contract_id, contract.contract_type, 
+        contract.service_type, contract.acv, contract.service_start_date, 
+        contract.service_end_date, employee.employee_fname, employee.employee_lname 
+        FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
+        WHERE contract.email_id = '$clientEmail' ";
+        return $query;
+    }
 
-   
+    function getActiveContracts() {
+        $clientEmail = $_COOKIE['email'];
+        $query = "SELECT contract.contract_id, contract.contract_type, 
+        contract.service_type, contract.acv, contract.service_start_date, 
+        contract.service_end_date, employee.employee_fname, employee.employee_lname 
+        FROM contract 
+        INNER JOIN employee 
+        ON contract.responsible_person_id = employee.employee_id 
+        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NOT NULL";
+        return $query;
+    }
+
+    function getExpiredContracts() {
+        $clientEmail = $_COOKIE['email'];
+        $query = "SELECT contract.contract_id, contract.contract_type, 
+        contract.service_type, contract.acv, contract.service_start_date, 
+        contract.service_end_date, employee.employee_fname, employee.employee_lname 
+        FROM contract 
+        INNER JOIN employee 
+        ON contract.responsible_person_id = employee.employee_id 
+        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NULL";
+        return $query;
+    }
+
+    if(isset($_GET['all'])){
+        $query = getAllContracts();
+        $result = mysqli_query($connection, $query);
+    }
+
+    if(isset($_GET['active'])){
+        $query = getActiveContracts();
+        $result = mysqli_query($connection, $query);
+    }
+
+    if(isset($_GET['expired'])){
+        $query= getExpiredContracts();
+        $result = mysqli_query($connection, $query);
+    }
 
     ob_flush();
     ?>
 
-<div class="container">
-    <div class ="header">
-        <h1><?php echo $client["company_name"] ?></h1>
-    </div>
+    <div class="container">
+        <div class ="header">
+            <h1><?php echo $client["company_name"] ?></h1>
+        </div>
 
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="#">Home</a></li>
-      <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Contracts
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Active</a></li>
-          <li><a href="#">Terminated</a></li>
-          <li><a href="ClientContracts.php">All</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Ratings
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Give Rating</a></li>
-          <li><a href="#">View Ratings</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</nav>
+        <nav class="navbar navbar-inverse">
+          <div class="container-fluid">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Ratings
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#">Give Rating</a></li>
+                      <li><a href="#">View Ratings</a></li>
+                  </ul>
+              </li>
+          </ul>
+      </div>
+  </nav>
 
-    <div class ="section-container">
-        <h4> Here are your contracts </h4>
+  <div class ="section-container">
+    <h4> Here are your contracts </h4>
+    <form method="get">
+        <input type="submit" class='btn' name="all" value="View All Contracts"/>
+        <input type="submit" class='btn' name="active" value="View Active Contracts"/>
+        <input type="submit" class='btn' name="expired" value="View Expired Contracts"/>
         <?php 
+            //$result = mysqli_query($connection, $query);
         echo "<table class='table table-striped'> 
         <tr>
-            <th>Contract ID</th>
-            <th>Type of Contract</th>
-            <th>Type of Service</th>
-            <th>ACV</th>
-            <th>Supervising Manager</th>
-            <th>Service Start Date</th>
-            <th>Service End Date</th>
+        <th>Contract ID</th>
+        <th>Type of Contract</th>
+        <th>Type of Service</th>
+        <th>ACV</th>
+        <th>Supervising Manager</th>
+        <th>Service Start Date</th>
+        <th>Service End Date</th>
         </tr>";
         while($row = mysqli_fetch_array($result)) {
             echo "<tr>";
@@ -95,8 +132,9 @@ ob_start();
             echo "</tr>";
         }
         echo "</table>"
-         ?>       
+        ?>       
     </div>
+</form>
 </div>
 
 </body>
