@@ -8,10 +8,6 @@ ob_start();
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <title>Client Dashboard</title>
-    <style>
-
-</style>
-
 </head>
 
 
@@ -24,13 +20,24 @@ ob_start();
     $clientEmail = $_COOKIE['email'];
 
 
+    if (!$clientEmail) {
+        header('Location:Login.php');
+    }
+
     $query = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
     $client = DB::getInstance()->getResult($query);
-    
+
+    $query = "SELECT contract.contract_id, contract.contract_type,
+    contract.service_type, contract.acv, contract.service_start_date, 
+    contract.service_end_date, employee.employee_fname, employee.employee_lname 
+    FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
+    WHERE contract.email_id = '$clientEmail' ";
+    $result = mysqli_query($connection, $query);
+
 
     function getAllContracts() {
         $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type, 
+        $query = "SELECT contract.contract_id, contract.contract_type,
         contract.service_type, contract.acv, contract.service_start_date, 
         contract.service_end_date, employee.employee_fname, employee.employee_lname 
         FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
@@ -40,25 +47,25 @@ ob_start();
 
     function getActiveContracts() {
         $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type, 
-        contract.service_type, contract.acv, contract.service_start_date, 
-        contract.service_end_date, employee.employee_fname, employee.employee_lname 
-        FROM contract 
-        INNER JOIN employee 
-        ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NOT NULL";
-        return $query;
-    }
-
-    function getExpiredContracts() {
-        $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type, 
+        $query = "SELECT contract.contract_id, contract.contract_type,
         contract.service_type, contract.acv, contract.service_start_date, 
         contract.service_end_date, employee.employee_fname, employee.employee_lname 
         FROM contract 
         INNER JOIN employee 
         ON contract.responsible_person_id = employee.employee_id 
         WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NULL";
+        return $query;
+    }
+
+    function getExpiredContracts() {
+        $clientEmail = $_COOKIE['email'];
+        $query = "SELECT contract.contract_id, contract.contract_type,
+        contract.service_type, contract.acv, contract.service_start_date, 
+        contract.service_end_date, employee.employee_fname, employee.employee_lname 
+        FROM contract 
+        INNER JOIN employee 
+        ON contract.responsible_person_id = employee.employee_id 
+        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NOT NULL";
         return $query;
     }
 
@@ -88,16 +95,8 @@ ob_start();
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Home</a></li>
-              
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Ratings
-                    <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="#">Give Rating</a></li>
-                      <li><a href="#">View Ratings</a></li>
-                  </ul>
-              </li>
+              <li class="active"><a href="ClientDashboard.php">Contracts</a></li>
+              <li class="dropdown"><a href="Rating.php">Review Management</a></li>
           </ul>
       </div>
   </nav>
@@ -109,7 +108,7 @@ ob_start();
         <input type="submit" class='btn' name="active" value="View Active Contracts"/>
         <input type="submit" class='btn' name="expired" value="View Expired Contracts"/>
         <?php 
-            //$result = mysqli_query($connection, $query);
+            
         echo "<table class='table table-striped'> 
         <tr>
         <th>Contract ID</th>
@@ -119,6 +118,7 @@ ob_start();
         <th>Supervising Manager</th>
         <th>Service Start Date</th>
         <th>Service End Date</th>
+        <th></th>
         </tr>";
         while($row = mysqli_fetch_array($result)) {
             echo "<tr>";
@@ -129,6 +129,7 @@ ob_start();
             echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
             echo "<td>" . $row['service_start_date'] . '</td>';
             echo "<td>" . $row['service_end_date'] . "</td>";
+            echo '<td><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn" role="button">Rate Service</a></td>';
             echo "</tr>";
         }
         echo "</table>"
