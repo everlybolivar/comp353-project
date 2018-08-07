@@ -64,14 +64,14 @@ ob_start();  //begin buffering the output
                     $sql = $connection->prepare("SELECT DISTINCT contract.email_id FROM contract INNER JOIN users ON users.email = contract.email_id WHERE users.email = ?");
                     $sql->bind_param("s", $email);
                     $sql->execute();
-                    $sql->bind_result($output);
+                    $sql->bind_result($clientEmail);
                     $sql = $sql->fetch();
 
-                    if(!empty($output)) {
+                    if($clientEmail == $email) {
                         header('Location:ClientDashboard.php');
                         exit();
                     } else {
-                        $badLogin = "Can't Login. Renter Credentials";
+                        $badLogin = "Can't Login. Not a client. Please contact sales associate.";
                     }
 
                 } else {
