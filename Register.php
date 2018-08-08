@@ -14,7 +14,7 @@ ob_start();  //begin buffering the output
 
 <body>
 
-<h1>Sign Up </h1>
+<h1>Sign Up</h1>
 
 <?php
 
@@ -82,6 +82,7 @@ ob_flush();
             <option value="manager">Manager</option>
             <option value="salesAssociate">Sales Associate</option>
             <option value="admin">Admin</option>
+            <option value="client">Client</option>
         </select>
     </div>
 
