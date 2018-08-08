@@ -8,11 +8,12 @@ ob_start();  //begin buffering the output
 <title>Contract CMS</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link href="css/register.css" rel="stylesheet">
 
 </head>
 
 
-<body>
+<body class="text-center">
 
 <h1>Sign Up</h1>
 
@@ -51,33 +52,31 @@ ob_flush();
 ?>
 
 
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+<form method="post" class="form-register" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
     <div class="form-group">
-        <label for="fName">First Name:</label>
-        <input name="fName" type="text" , id="fName" placeholder="Enter Your First Name">
-        <span class="error"> <?php echo $fNameEmpty; ?> </span>
+        <label for="fName" class="sr-only">First Name</label>
+        <input name="fName" type="text" class="form-control" id="fName" placeholder="First Name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="LName" class="sr-only">Last Name:</label>
+        <input name="lName" class="form-control" type="text" id="lName" placeholder="Last Name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="Email" class="sr-only">Email</label>
+        <input name="email" class="form-control" type="email" id="email" placeholder="Email" required>
     </div>
 
 
     <div class="form-group">
-        <label for="LName">Last Name:</label>
-        <input name="lName" type="text" , id="lName" placeholder="Enter Your Last Name">
+        <label for="password" class="sr-only">Password</label>
+        <input name="password" class="form-control" type="password" id="password" placeholder="Password" required>
     </div>
 
     <div class="form-group">
-        <label for="Email">Email:</label>
-        <input name="email" type="email" , id="email" placeholder="Enter Email">
-    </div>
-
-
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input name="password" type="password" , id="password" placeholder="Enter Password">
-    </div>
-
-    <div class="form-group">
-        <select name ="formRoles">
+        <select name ="formRoles" class="custom-select custom-select-lg mb-3">
             <option value="employee">Employee</option>
             <option value="manager">Manager</option>
             <option value="salesAssociate">Sales Associate</option>
