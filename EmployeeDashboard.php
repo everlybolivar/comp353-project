@@ -3,7 +3,13 @@ ob_start();  //begin buffering the output
 ?>
 <html>
 
+<style>
+    .contract-type {
+        padding-top: 20px;
+    }
+</style>
 <head>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -28,19 +34,26 @@ if (!$employeeID) {
     header('Location:Login.php');
 }
 
-$query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id WHERE employee.employee_id = " . $employeeID . ";";
+$query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id WHERE employee.employee_id = '$employeeID'";
 $contract = DB::getInstance()->getResult($query);
 
-$query = "SELECT * FROM employee WHERE employee_id = " . $employeeID . ";";
+$query = "SELECT * FROM employee WHERE employee_id = '$employeeID'";
 $employee = DB::getInstance()->getResult($query);
 $managerID = $employee["manager_id"];
 
-$query = "SELECT * FROM employee WHERE employee_id = " . $managerID . ";";
+$query = "SELECT * FROM employee WHERE employee_id = '$managerID'";
 $manager = DB::getInstance()->getResult($query);
 
 function changeContractType($type)
 {
-    $query = "UPDATE employee SET employee_contract_type = '" . $type . "' WHERE employee_id = " . $_COOKIE['employeeID'] . ";";
+    $query = "UPDATE employee SET employee_contract_type = '$type' WHERE employee_id = '$_COOKIE[employeeID]'";
+    DB::getInstance()->dbquery($query);
+    header("Refresh:0");
+}
+
+function changeInsurancePlan($insurance)
+{
+    $query = "UPDATE employee SET employee_insurance_plan = '$insurance' WHERE employee_id = '$_COOKIE[employeeID]'";
     DB::getInstance()->dbquery($query);
     header("Refresh:0");
 }
@@ -61,54 +74,96 @@ if (array_key_exists('Silver', $_POST)) {
     changeContractType('Silver');
 }
 
+if (array_key_exists('Premium-Insurance', $_POST)) {
+    changeInsurancePlan('Premium');
+}
+
+if (array_key_exists('Silver-Insurance', $_POST)) {
+    changeInsurancePlan('Silver');
+}
+
+if (array_key_exists('Normal-Insurance', $_POST)) {
+    changeInsurancePlan('Normal');
+}
+
 ob_flush();
 ?>
 
-<div class="container col-centered">
-    <div class="col-md-6 offset-md-4">
-        <div class="row">
-            <h2><?php echo $employee["employee_fname"] . "'s " ?> Dashboard</h2>
-        </div>
-        <div class="row">
-            <h6>Contract Type: <?php echo $employee["employee_contract_type"] ?></h6>
-        </div>
-        <div class="row">
-            <h6>Current Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></h6>
-        </div>
-        <div class="row">
-            <h6>Manager: <?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?></h6>
-        </div>
-        <div class="row">
-            <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                    Contract Types
-                </div>
-                <form method="post">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            Premium
-                            <input type="submit" name="Premium" class="btn btn-outline-primary float-right"
-                                   value="Request"/>
-                        </li>
-                        <li class="list-group-item">
-                            Gold
-                            <input type="submit" name="Gold" class="btn btn-outline-primary float-right"
-                                   value="Request"/>
-                        </li>
-                        <li class="list-group-item">Diamond
-                            <input type="submit" name="Diamond" class="btn btn-outline-primary float-right"
-                                   value="Request"/>
-                        </li>
-                        <li class="list-group-item">Silver
-                            <input type="submit" name="Silver" class="btn btn-outline-primary float-right"
-                                   value="Request"/>
-                        </li>
-                    </ul>
-                </form>
+
+<div class="container col-centered col-md-6 offset-md-4">
+    <div class="row">
+        <h2><?php echo $employee["employee_fname"] . "'s " ?> Dashboard</h2>
+    </div>
+    <div class="row">
+        <h6>Contract Type: <?php echo $employee["employee_contract_type"] ?></h6>
+    </div>
+    <div class="row">
+        <h6>Current Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></h6>
+    </div>
+    <div class="row">
+        <h6>Insurance Plan: <?php echo $employee["employee_insurance_plan"] ?></h6>
+    </div>
+    <div class="row">
+        <h6>Manager: <?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?></h6>
+    </div>
+</div>
+
+<div class="container contract-type col-centered col-md-6 offset-md-2">
+    <div class="row offset-2">
+        <div class="card col-6" style="width: 18rem;">
+            <div class="card-header">
+                Contract Types
             </div>
+            <form method="post">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Premium
+                        <input type="submit" name="Premium" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">
+                        Gold
+                        <input type="submit" name="Gold" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">Diamond
+                        <input type="submit" name="Diamond" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">Silver
+                        <input type="submit" name="Silver" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                </ul>
+            </form>
+        </div>
+        <div class="card col-6" style="width: 18rem;">
+            <div class="card-header">
+                Insurance Plan
+            </div>
+            <form method="post">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Premium
+                        <input type="submit" name="Premium-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                    <li class="list-group-item">
+                        Silver
+                        <input type="submit" name="Silver-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                    <li class="list-group-item">Normal
+                        <input type="submit" name="Normal-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                </ul>
+            </form>
         </div>
     </div>
 </div>
+
+</body>
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
