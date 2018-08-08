@@ -39,11 +39,12 @@ ob_start();
     $query = "INSERT INTO ratings (contract_worked, manager_rated, rate)
     VALUES ($contractID, $managerID, $clientrate)";
 
+    $confirmation = true;
     if (isset($_POST['submit_rating'] ) ) {
-        if ($connection->query($query) === TRUE) {
-            echo "Rating Created.";
+        if ($connection->query($query) === FALSE) {
+            $confirmation = false ;
         } else {
-            echo "Rating was not made.";
+            echo "Problem with rating.";
         }
     } 
 
@@ -82,6 +83,11 @@ ob_start();
             <label class="radio-inline"><input type="radio" name="rating" value="9">9</label>
             <label class="radio-inline"><input type="radio" name="rating" value="10">10</label>
             <p><br><input type="submit" class='btn btn-default' name="submit_rating" value="Submit Rating"/></p>
+            <?php if (!$confirmation): ?>
+                <div class="alert alert-danger" role="alert">
+                    You have already reviewed this service.
+                </div>
+            <?php endif; ?>
         </form>
     </p>
 </div>
