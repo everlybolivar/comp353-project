@@ -10,16 +10,16 @@ ob_start();  //begin buffering the output
     <title>Contract CMS</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link href="css/signin.css" rel="stylesheet">
 </head>
 
 
-<body>
+<body class="text-center">
 
 <?php
 require 'DB.php';
 //validation
-$badLogin = "";
+$invalidLogin = false;
 $fName = $lName = $email = $password = "";
 $emailCheck = empty($_POST["email"]);
 $passwordCheck = empty($_POST["password"]);
@@ -79,34 +79,36 @@ if (!$emailCheck && !$passwordCheck) {
                 header('Location:SalesDashboard.php');
                 exit();
             } else {
-                $badLogin = "Can't Login. Renter Credentials";
+                $invalidLogin = true;
             }
-
         }
+        $invalidLogin = true;
     }
     ob_flush();
 }
 ?>
 
 
-<h1>Please Login </h1>
-
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+<form method="post" class="form-signin" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <div class="form-group">
-        <label for="email">Login Email:</label>
-        <input type="email" , name="email" id="email" placeholder="Enter Email">
+        <label for="email" class="sr-only">Email</label>
+        <input type="email" name="email" id="email" class="form-control" placeholder="Enter Email">
     </div>
 
 
     <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" , name="password" id="password" placeholder="Enter Password">
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Enter Password">
     </div>
 
 
-    <button type="submit" class="btn btn-primary"> Login</button>
-    <span class="error"> <?php echo $badLogin; ?> </span>
-
+    <button type="submit" class="btn btn-primary btn-lg btn-primary btn-block"> Login</button>
+    <?php if ($invalidLogin): ?>
+        <div class="alert alert-danger invalid-login" role="alert">
+            Can't Login. Renter Credentials
+        </div>
+    <?php endif; ?>
 </form>
 
 
