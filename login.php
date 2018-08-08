@@ -71,6 +71,7 @@ ob_start();  //begin buffering the output
                     $sql = $sql->fetch();
 
                     if($clientEmail == $email) {
+                        setcookie("clientID", $employeeID, time() + (86400 * 30));
                         header('Location:ClientDashboard.php');
                         exit();
                     } else {
@@ -103,10 +104,11 @@ ob_start();  //begin buffering the output
                         $invalidLogin = true;
                     }
                 }
-                $invalidLogin = true;
             }
-            }
-            ob_flush();
+            $invalidLogin = true;
+        }
+
+        ob_flush();
     }
     ?>
 

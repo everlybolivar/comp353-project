@@ -18,14 +18,16 @@ ob_start();
     $connection = DB::getConnection();
 
     $clientEmail = $_COOKIE['email'];
+    $clientID = $_COOKIE['clientID'];
 
-
-    if (!$clientEmail) {
+    if ($clientID != NULL) {
         header('Location:Login.php');
     }
 
     $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
     $client = DB::getInstance()->getResult($sql);
+
+
 
     $query = "SELECT contract.contract_id, contract.contract_type,
     contract.service_type, contract.acv, contract.service_start_date, 
@@ -129,7 +131,13 @@ ob_start();
             echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
             echo "<td>" . $row['service_start_date'] . '</td>';
             echo "<td>" . $row['service_end_date'] . "</td>";
-            echo '<td><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn" role="button">Rate Service</a></td>';
+            echo '<td>'; 
+            if($row['service_end_date'] == Null) {
+                echo "<center>Contract must be completed before review</center>";
+            }
+            else { 
+                echo '<center><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn" role="button">Rate Service</a></center>'; }
+            echo '</td>';
             echo "</tr>";
         }
         echo "</table>"
