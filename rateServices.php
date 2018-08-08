@@ -18,27 +18,34 @@ ob_start();
     $connection = DB::getConnection();
 
     $clientEmail = $_COOKIE['email'];
-    $id = $_GET['id'];
-
-    $sql = "SELECT * FROM employee WHERE employee_id = '$id'";
-    $manager = DB::getInstance()->getResult($sql);
 
     if (!$clientEmail) {
         header('Location:Login.php');
     }
 
-    $query = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
-    $client = DB::getInstance()->getResult($query);
+    $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
+    $client = DB::getInstance()->getResult($sql);
     $company = $client["company_name"];
 
-    $query = "SELECT contract.contract_id, contract.company_name,
-    employee.employee_fname, employee.employee_lname, 
-    ratings.rate 
-    FROM (( employee INNER JOIN ratings ON employee.employee_id = ratings.manager_rated) 
-    INNER JOIN contract ON ratings.contract_worked = contract.contract_id) 
-    WHERE ratings.manager_rated = '$id'
-    ORDER BY ratings.rate ASC";
-    $result = mysqli_query($connection, $query);
+    $contractID = $_GET['id'];
+    $sql2 = "SELECT * FROM contract WHERE contract_id = '$contractID'";
+    $contract = DB::getInstance()->getResult($sql2);
+
+    $managerID = $contract["responsible_person_id"]; 
+    $sql3 = "SELECT employee_fname, employee_lname FROM employee WHERE employee_id = '$managerID'";
+    $manager = DB::getInstance()->getResult($sql3);
+
+    $clientrate = $_POST['rating'];
+    $query = "INSERT INTO ratings (contract_worked, manager_rated, rate)
+    VALUES ($contractID, $managerID, $clientrate)";
+
+    if (isset($_POST['submit_rating'] ) ) {
+        if ($connection->query($query) === TRUE) {
+            echo "Rating Created.";
+        } else {
+            echo "Rating was not made.";
+        }
+    } 
 
     ob_flush();
     ?>
@@ -58,8 +65,25 @@ ob_start();
   </nav>
 
   <div class ="section-container">
-   <h2> Rate Services </h2>  
- 
+     <h2>Rate Services</h2>  
+     <p> 
+        You are rating <?php echo $manager['employee_fname'] . " " . $manager['employee_lname'] ?>'s Services for the work done on contract <?php echo $contractID ?>. 
+        <br><br>
+        <h4>Please select a rating between 1 (lowest) to 10 (highest).</h4>
+        <form method = "POST">
+            <label class="radio-inline"><input type="radio" name="rating" value="1">1</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="2">2</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="3">3</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="4">4</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="5">5</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="6">6</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="7">7</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="8">8</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="9">9</label>
+            <label class="radio-inline"><input type="radio" name="rating" value="10">10</label>
+            <p><br><input type="submit" class='btn btn-default' name="submit_rating" value="Submit Rating"/></p>
+        </form>
+    </p>
 </div>
 </div>
 
