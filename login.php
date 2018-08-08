@@ -1,5 +1,16 @@
 <?php
 ob_start();  //begin buffering the output
+
+function abspath()
+{
+    return $_SERVER['DOCUMENT_ROOT'];
+}
+
+function directory()
+{
+    return '/Admin/';
+}
+
 ?>
 <html>
 
@@ -16,15 +27,12 @@ ob_start();  //begin buffering the output
 
 <body class="text-center">
 
-    <?php
-    require 'DB.php';
-
+    <?php require 'DB.php';
 //validation
     $invalidLogin = false;
     $fName = $lName = $email = $password = "";
     $emailCheck = empty($_POST["email"]);
     $passwordCheck = empty($_POST["password"]);
-
 
 //validation for empty passwords
     if ($emailCheck) {
@@ -95,9 +103,11 @@ ob_start();  //begin buffering the output
                         header('Location:ManagerDashboard.php');
                         exit();
                     } else if ($out == 13) {
+                        setcookie("admin", $employeeID, time() + (86400 * 30));
                         header('Location:AdminDashboard.php');
                         exit();
                     } else if ($out == 14) {
+                        setcookie("sales", time() + (86400 * 30));
                         header('Location:SalesDashboard.php');
                         exit();
                     } else {
