@@ -1,5 +1,16 @@
 <?php
 ob_start();  //begin buffering the output
+
+function abspath()
+{
+    return $_SERVER['DOCUMENT_ROOT'];
+}
+
+function directory()
+{
+    return '/Admin/';
+}
+
 ?>
 <html>
 
@@ -17,6 +28,7 @@ ob_start();  //begin buffering the output
 <body>
 
 <?php
+require 'DB.php';
 //validation
 $badLogin = "";
 $fName = $lName = $email = $password = "";
@@ -33,27 +45,27 @@ if ($passwordCheck) {
 if (!$emailCheck && !$passwordCheck) {
     $pw = $_POST["password"];
     $email = $_POST["email"];
-    $_COOKIE['email'] = $_POST["email"];
-    $_COOKIE['password'] = $_POST["password"];
+    setcookie("email", $email, time() + (86400 * 30));
 
-    $host = 'ddc353.encs.concordia.ca';
-    $username = 'ddc353_1';
-    $password = '353DBpro';
-    $db = 'ddc353_1';
-    $db_port = '3306';
-    echo "pw" . $pw;
-    echo "email" . $email;
-    echo "formroles" . $email;
-
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
-        $sql = $connection->prepare("SELECT * FROM users WHERE email = ? && password = ?");
-        $sql->bind_param("ss", $email, $pw);
+        $sql = $connection->prepare("SELECT employee_id FROM users WHERE email = ? && password = ?");
+        $sql->bind_param(  "ss", $email, $pw);
+
+        // Execute query
         $sql->execute();
+
+        // Store result to get properties
         $sql->store_result();
         $rowNum = $sql->num_rows;
+
+        // Bind result to variable
+        $sql->bind_result($employeeID);
+
+        // Getting result
+        $sql->fetch();
 
         if ($rowNum == 1) {
             //SELECT department_id FROM employee INNER JOIN users ON users.employee_id = employee.employee_id WHERE users.email = "ronn.pang@gmail.com";
@@ -62,25 +74,24 @@ if (!$emailCheck && !$passwordCheck) {
             $sql->bind_param("s", $email);
             $sql->execute();
             $sql->bind_result($out);
-            $sql->fetch();
+            $sql = $sql->fetch();
 
             if ($out == 7) {
+                setcookie("employeeID", $employeeID, time() + (86400 * 30));
                 header('Location:EmployeeDashboard.php');
                 exit();
-            }
-            else if ($out == 1) {
+            } else if ($out == 1) {
                 header('Location:ManagerDashboard.php');
                 exit();
-            }
-            else if ($out == 13) {
+            } else if ($out == 2) {
+
+                setcookie("admin", $employeeID, time() + (86400 * 30));
                 header('Location:AdminDashboard.php');
                 exit();
-            }
-            else if ($out == 14) {
+            } else if ($out == 14) {
                 header('Location:SalesDashboard.php');
                 exit();
-            }
-            else {
+            } else {
                 $badLogin = "Can't Login. Renter Credentials";
             }
 
