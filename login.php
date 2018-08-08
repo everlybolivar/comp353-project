@@ -25,6 +25,7 @@ ob_start();  //begin buffering the output
     $emailCheck = empty($_POST["email"]);
     $passwordCheck = empty($_POST["password"]);
 
+
 //validation for empty passwords
     if ($emailCheck) {
         $emailEmpty = "Please enter your email";
@@ -104,9 +105,8 @@ ob_start();  //begin buffering the output
                 }
                 $invalidLogin = true;
             }
-            
+            }
             ob_flush();
-        }
     }
     ?>
 
@@ -122,7 +122,6 @@ ob_start();  //begin buffering the output
             <label for="password" class="sr-only">Password</label>
             <input type="password" name="password" id="password" class="form-control" placeholder="Enter Password">
         </div>
-
 
         <button type="submit" class="btn btn-primary btn-lg btn-primary btn-block"> Login</button>
         <?php if ($invalidLogin): ?>
