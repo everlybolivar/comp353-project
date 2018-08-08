@@ -7,6 +7,10 @@ ob_start();  //begin buffering the output
     .contract-type {
         padding-top: 20px;
     }
+
+    .table td {
+        text-align: center;
+    }
 </style>
 <head>
 
@@ -20,10 +24,11 @@ ob_start();  //begin buffering the output
 </head>
 
 
-<body>
+<body class="text-center">
 
 <?php
 require 'DB.php';
+include 'Nav.php';
 
 $connection = DB::getConnection();
 
@@ -89,28 +94,43 @@ if (array_key_exists('Normal-Insurance', $_POST)) {
 ob_flush();
 ?>
 
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table">
+                <thead class="thead">
+                <tr>
+                    <th colspan="2" class="text-center"><?php echo $employee["employee_fname"] . "'s " ?> Dashboard</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">Contract Type</th>
+                    <td><?php echo $employee["employee_contract_type"] ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Current Contract</th>
+                    <td>Current
+                        Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Insurance Plan</th>
+                    <td><?php echo $employee["employee_insurance_plan"] ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Manager</th>
+                    <td><?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?> </td>
+                </tr>
+                </tbody>
+            </table>
 
-<div class="container col-centered col-md-6 offset-md-4">
-    <div class="row">
-        <h2><?php echo $employee["employee_fname"] . "'s " ?> Dashboard</h2>
-    </div>
-    <div class="row">
-        <h6>Contract Type: <?php echo $employee["employee_contract_type"] ?></h6>
-    </div>
-    <div class="row">
-        <h6>Current Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></h6>
-    </div>
-    <div class="row">
-        <h6>Insurance Plan: <?php echo $employee["employee_insurance_plan"] ?></h6>
-    </div>
-    <div class="row">
-        <h6>Manager: <?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?></h6>
+        </div>
     </div>
 </div>
 
-<div class="container contract-type col-centered col-md-6 offset-md-2">
-    <div class="row offset-2">
-        <div class="card col-6" style="width: 18rem;">
+<div class="container contract-type">
+    <div class="row">
+        <div class="card" style="width: 18rem;">
             <div class="card-header">
                 Contract Types
             </div>
@@ -137,7 +157,7 @@ ob_flush();
                 </ul>
             </form>
         </div>
-        <div class="card col-6" style="width: 18rem;">
+        <div class="card" style="width: 18rem;">
             <div class="card-header">
                 Insurance Plan
             </div>
