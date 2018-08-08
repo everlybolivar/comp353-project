@@ -23,8 +23,8 @@ ob_start();
         header('Location:Login.php');
     }
 
-    $query = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
-    $client = DB::getInstance()->getResult($query);
+    $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
+    $client = DB::getInstance()->getResult($sql);
     $company = $client["company_name"];
 
     $query = "SELECT contract.contract_id, contract.responsible_person_id,
@@ -68,7 +68,7 @@ ob_start();
             echo "<td>" . $row['contract_id'] . "</td>";
             echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
             echo "<td>" . $row['rate'] . '</td>';
-            echo '<td><a href="viewRating.php?id=' . $row['responsible_person_id'] . '" class="btn" role="button">More Ratings</a></td>';
+            echo '<td><a href="viewRating.php?id=' . $row['responsible_person_id'] . '" class="btn" role="button">More Contract Ratings</a></td>';
             echo "</tr>";
         }
         echo "</table>"

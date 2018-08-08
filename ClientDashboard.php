@@ -24,8 +24,8 @@ ob_start();
         header('Location:Login.php');
     }
 
-    $query = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
-    $client = DB::getInstance()->getResult($query);
+    $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
+    $client = DB::getInstance()->getResult($sql);
 
     $query = "SELECT contract.contract_id, contract.contract_type,
     contract.service_type, contract.acv, contract.service_start_date, 
