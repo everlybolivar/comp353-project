@@ -3,7 +3,13 @@ ob_start();  //begin buffering the output
 ?>
 <html>
 
+<style>
+    .contract-type {
+        padding-top: 20px;
+    }
+</style>
 <head>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -17,55 +23,148 @@ ob_start();  //begin buffering the output
 <body>
 
 <?php
-//validation
-$badLogin = "";
-$fName = $lName = $email = $password = "";
-$username = $_cookie["email"];
+require 'DB.php';
 
+$connection = DB::getConnection();
 
-$host = 'ddc353.encs.concordia.ca';
-$username = 'ddc353_1';
-$password = '353DBpro';
-$db = 'ddc353_1';
-$db_port = '3306';
+$employeeID = $_COOKIE['employeeID'];
 
+// Redirect to login if no employee cookie
+if (!$employeeID) {
+    header('Location:Login.php');
+}
 
-$connection = mysqli_connect($host, $username, $password, $db, $db_port);
-if ($connection->connect_error) {
-    die("error failure" . $connection->connect_error);
-} else {
-    $sql = $connection->prepare("SELECT * FROM contract INNER JOIN users ON users. WHERE email = ?");
-    $sql->bind_param("s", $email);
+$query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id WHERE employee.employee_id = '$employeeID'";
+$contract = DB::getInstance()->getResult($query);
 
+$query = "SELECT * FROM employee WHERE employee_id = '$employeeID'";
+$employee = DB::getInstance()->getResult($query);
+$managerID = $employee["manager_id"];
+
+$query = "SELECT * FROM employee WHERE employee_id = '$managerID'";
+$manager = DB::getInstance()->getResult($query);
+
+function changeContractType($type)
+{
+    $query = "UPDATE employee SET employee_contract_type = '$type' WHERE employee_id = '$_COOKIE[employeeID]'";
+    DB::getInstance()->dbquery($query);
+    header("Refresh:0");
+}
+
+function changeInsurancePlan($insurance)
+{
+    $query = "UPDATE employee SET employee_insurance_plan = '$insurance' WHERE employee_id = '$_COOKIE[employeeID]'";
+    DB::getInstance()->dbquery($query);
+    header("Refresh:0");
+}
+
+if (array_key_exists('Premium', $_POST)) {
+    changeContractType('Premium');
+}
+
+if (array_key_exists('Diamond', $_POST)) {
+    changeContractType('Diamond');
+}
+
+if (array_key_exists('Gold', $_POST)) {
+    changeContractType('Gold');
+}
+
+if (array_key_exists('Silver', $_POST)) {
+    changeContractType('Silver');
+}
+
+if (array_key_exists('Premium-Insurance', $_POST)) {
+    changeInsurancePlan('Premium');
+}
+
+if (array_key_exists('Silver-Insurance', $_POST)) {
+    changeInsurancePlan('Silver');
+}
+
+if (array_key_exists('Normal-Insurance', $_POST)) {
+    changeInsurancePlan('Normal');
 }
 
 ob_flush();
-
 ?>
 
 
-<h1>Please Login </h1>
-
-<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-    <div class="form-group">
-        <label for="email">Login Email:</label>
-        <input type="email" , name="email" id="email" placeholder="Enter Email">
+<div class="container col-centered col-md-6 offset-md-4">
+    <div class="row">
+        <h2><?php echo $employee["employee_fname"] . "'s " ?> Dashboard</h2>
     </div>
-
-
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" , name="password" id="password" placeholder="Enter Password">
+    <div class="row">
+        <h6>Contract Type: <?php echo $employee["employee_contract_type"] ?></h6>
     </div>
+    <div class="row">
+        <h6>Current Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></h6>
+    </div>
+    <div class="row">
+        <h6>Insurance Plan: <?php echo $employee["employee_insurance_plan"] ?></h6>
+    </div>
+    <div class="row">
+        <h6>Manager: <?php echo $manager["employee_fname"] . " " . $manager["employee_lname"] ?></h6>
+    </div>
+</div>
 
-
-    <button type="submit" class="btn btn-primary"> Login</button>
-    <span class="error"> <?php echo $badLogin; ?> </span>
-
-</form>
-
+<div class="container contract-type col-centered col-md-6 offset-md-2">
+    <div class="row offset-2">
+        <div class="card col-6" style="width: 18rem;">
+            <div class="card-header">
+                Contract Types
+            </div>
+            <form method="post">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Premium
+                        <input type="submit" name="Premium" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">
+                        Gold
+                        <input type="submit" name="Gold" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">Diamond
+                        <input type="submit" name="Diamond" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                    <li class="list-group-item">Silver
+                        <input type="submit" name="Silver" class="btn btn-outline-primary float-right"
+                               value="Request"/>
+                    </li>
+                </ul>
+            </form>
+        </div>
+        <div class="card col-6" style="width: 18rem;">
+            <div class="card-header">
+                Insurance Plan
+            </div>
+            <form method="post">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        Premium
+                        <input type="submit" name="Premium-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                    <li class="list-group-item">
+                        Silver
+                        <input type="submit" name="Silver-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                    <li class="list-group-item">Normal
+                        <input type="submit" name="Normal-Insurance" class="btn btn-outline-primary float-right"
+                               value="Change"/>
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</div>
 
 </body>
+
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
