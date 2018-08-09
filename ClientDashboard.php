@@ -20,7 +20,7 @@ ob_start();
     $clientEmail = $_COOKIE['email'];
     $clientID = $_COOKIE['clientID'];
 
-    if ($clientID != NULL) {
+    if (!$clientID) {
         header('Location:Login.php');
     }
 
@@ -55,7 +55,7 @@ ob_start();
         FROM contract 
         INNER JOIN employee 
         ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NULL";
+        WHERE contract.email_id = '$clientEmail' && DATE(NOW()) < DATE(contract.service_end_date)";
         return $query;
     }
 
@@ -67,7 +67,7 @@ ob_start();
         FROM contract 
         INNER JOIN employee 
         ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' && contract.service_end_date IS NOT NULL";
+        WHERE contract.email_id = '$clientEmail' && DATE(NOW()) > DATE(contract.service_end_date)";
         return $query;
     }
 

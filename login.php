@@ -28,6 +28,11 @@ function directory()
 <body class="text-center">
 
     <?php require 'DB.php';
+
+    if (isset($_POST['register'])) {
+        header("Location:Register.php");
+        exit;
+    }
 //validation
     $invalidLogin = false;
     $fName = $lName = $email = $password = "";
@@ -79,7 +84,7 @@ function directory()
                     $sql = $sql->fetch();
 
                     if($clientEmail == $email) {
-                        setcookie("clientID", $employeeID, time() + (86400 * 30));
+                        setcookie("clientID", time() + (86400 * 30));
                         header('Location:ClientDashboard.php');
                         exit();
                     } else {
@@ -136,6 +141,8 @@ function directory()
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg btn-primary btn-block"> Login</button>
+        <button type="submit" class="btn btn-secondary btn-lg btn-secondary btn-block" name="register"> Register</button>
+
         <?php if ($invalidLogin): ?>
             <div class="alert alert-danger invalid-login" role="alert">
                 Can't Login. Renter Credentials
