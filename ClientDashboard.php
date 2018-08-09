@@ -27,8 +27,6 @@ ob_start();
     $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
     $client = DB::getInstance()->getResult($sql);
 
-
-
     $query = "SELECT contract.contract_id, contract.contract_type,
     contract.service_type, contract.acv, contract.service_start_date, 
     contract.service_end_date, employee.employee_fname, employee.employee_lname 
@@ -36,53 +34,55 @@ ob_start();
     WHERE contract.email_id = '$clientEmail' ";
     $result = mysqli_query($connection, $query);
 
-
-    function getAllContracts() {
+    function getContracts($type) {
         $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type,
-        contract.service_type, contract.acv, contract.service_start_date, 
-        contract.service_end_date, employee.employee_fname, employee.employee_lname 
-        FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' ";
-        return $query;
+
+        switch ($type) {
+            case "all":
+            return "SELECT contract.contract_id, contract.contract_type,
+            contract.service_type, contract.acv, contract.service_start_date, 
+            contract.service_end_date, employee.employee_fname, employee.employee_lname 
+            FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
+            WHERE contract.email_id = '$clientEmail' ";
+            break;
+
+            case "active":
+            return "SELECT contract.contract_id, contract.contract_type,
+            contract.service_type, contract.acv, contract.service_start_date, 
+            contract.service_end_date, employee.employee_fname, employee.employee_lname 
+            FROM contract 
+            INNER JOIN employee 
+            ON contract.responsible_person_id = employee.employee_id 
+            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) < DATE(contract.service_end_date)";
+            break;
+
+            case "expired":
+            return "SELECT contract.contract_id, contract.contract_type,
+            contract.service_type, contract.acv, contract.service_start_date, 
+            contract.service_end_date, employee.employee_fname, employee.employee_lname 
+            FROM contract 
+            INNER JOIN employee 
+            ON contract.responsible_person_id = employee.employee_id 
+            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) > DATE(contract.service_end_date)";
+        }
     }
 
-    function getActiveContracts() {
-        $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type,
-        contract.service_type, contract.acv, contract.service_start_date, 
-        contract.service_end_date, employee.employee_fname, employee.employee_lname 
-        FROM contract 
-        INNER JOIN employee 
-        ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' && DATE(NOW()) < DATE(contract.service_end_date)";
-        return $query;
-    }
-
-    function getExpiredContracts() {
-        $clientEmail = $_COOKIE['email'];
-        $query = "SELECT contract.contract_id, contract.contract_type,
-        contract.service_type, contract.acv, contract.service_start_date, 
-        contract.service_end_date, employee.employee_fname, employee.employee_lname 
-        FROM contract 
-        INNER JOIN employee 
-        ON contract.responsible_person_id = employee.employee_id 
-        WHERE contract.email_id = '$clientEmail' && DATE(NOW()) > DATE(contract.service_end_date)";
-        return $query;
-    }
 
     if(isset($_GET['all'])){
-        $query = getAllContracts();
+        $type = "all";
+        $query = getContracts($type);
         $result = mysqli_query($connection, $query);
     }
 
     if(isset($_GET['active'])){
-        $query = getActiveContracts();
+        $type = "active";
+        $query = getContracts($type);
         $result = mysqli_query($connection, $query);
     }
 
     if(isset($_GET['expired'])){
-        $query= getExpiredContracts();
+        $type = "expired";
+        $query = getContracts($type);
         $result = mysqli_query($connection, $query);
     }
 
@@ -103,47 +103,56 @@ ob_start();
       </div>
   </nav>
 
-  <div class ="section-container">
+  <div class ="container">
     <h4> Here are your contracts </h4>
     <form method="get">
-        <input type="submit" class='btn' name="all" value="View All Contracts"/>
-        <input type="submit" class='btn' name="active" value="View Active Contracts"/>
-        <input type="submit" class='btn' name="expired" value="View Expired Contracts"/>
-        <?php 
-            
-        echo "<table class='table table-striped'> 
-        <tr>
-        <th>Contract ID</th>
-        <th>Type of Contract</th>
-        <th>Type of Service</th>
-        <th>ACV</th>
-        <th>Supervising Manager</th>
-        <th>Service Start Date</th>
-        <th>Service End Date</th>
-        <th></th>
-        </tr>";
-        while($row = mysqli_fetch_array($result)) {
-            echo "<tr>";
-            echo "<td>" . $row['contract_id'] . "</td>";
-            echo "<td>" . $row['contract_type'] . "</td>";
-            echo "<td>" . $row['service_type'] . "</td>";
-            echo "<td>" . $row['acv'] . "</td>";
-            echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
-            echo "<td>" . $row['service_start_date'] . '</td>';
-            echo "<td>" . $row['service_end_date'] . "</td>";
-            echo '<td>'; 
-            if($row['service_end_date'] == Null) {
-                echo "<center>Contract must be completed before review</center>";
-            }
-            else { 
-                echo '<center><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn" role="button">Rate Service</a></center>'; }
-            echo '</td>';
-            echo "</tr>";
-        }
-        echo "</table>"
-        ?>       
-    </div>
-</form>
+        <div class="section-container">
+            <div class="btn-group">
+                <input type="submit" class='btn btn-default' name="all" value="View All Contracts"/>
+                <input type="submit" class='btn btn-default' name="active" value="View Active Contracts"/>
+                <input type="submit" class='btn btn-default' name="expired" value="View Expired Contracts"/>
+            </div>
+        </div>
+        
+        <div class ="section-container">
+            <?php 
+            if(mysqli_num_rows($result) == 0) {
+                echo '<br>There are no Contracts listed.';
+            } else {
+                echo "<br><table class='table table-striped'> 
+                <tr>
+                <th>Contract ID</th>
+                <th>Type of Contract</th>
+                <th>Type of Service</th>
+                <th>ACV</th>
+                <th>Supervising Manager</th>
+                <th>Service Start Date</th>
+                <th>Service End Date</th>
+                <th></th>
+                </tr>";
+                while($row = mysqli_fetch_array($result)) {
+                    echo "<tr>";
+                    echo "<td>" . $row['contract_id'] . "</td>";
+                    echo "<td>" . $row['contract_type'] . "</td>";
+                    echo "<td>" . $row['service_type'] . "</td>";
+                    echo "<td>" . $row['acv'] . "</td>";
+                    echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
+                    echo "<td>" . $row['service_start_date'] . '</td>';
+                    echo "<td>" . $row['service_end_date'] . "</td>";
+                    echo '<td>'; 
+                    if($row['service_end_date'] == Null) {
+                        echo '<button type="button" class="btn btn-default disabled">Contract must be completed before review</button>';
+                    } else { 
+                        echo '<center><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn btn-default" role="button">Rate Service</a></center>'; }
+                        echo '</td>';
+                        echo "</tr>";
+                    }
+                }
+                echo "</table>"
+                ?>  
+            </div>     
+        </div>
+    </form>
 </div>
 
 </body>

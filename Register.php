@@ -21,36 +21,27 @@ ob_start();  //begin buffering the output
 
 require_once('RegisterValidation.php');
 //validation
-$fName = $lName = $email = $password = "";
-$fNameCheck = empty($_POST["fName"]);
-$lNameCheck = empty($_POST["lName"]);
-$emailCheck = empty($_POST["email"]);
-$passwordCheck = empty($_POST["password"]);
+if (!empty($_POST)) {
+    $fName = $_POST["fName"];
+    $lName = $_POST["lName"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $role = $_POST["formRoles"];
+    $emailError = "";
 
-if ($fNameCheck) {
-    $fNameEmpty = "Please enter your first name";
-}
-if ($lNameCheck) {
-    $lNameEmpty = "Please enter your last name";
-}
-if ($emailCheck) {
-    $emailEmpty = "Please enter your email";
-}
-if ($passwordCheck) {
-    $pwdEmpty = "Please enter a password";
+    if (duplicateEmail($email)) {
+        $emailError = "This email already exist.";
+
+    } else {
+        $emailError = "";
+        $_COOKIE['email'] = $email;
+        Register($fName, $lName, $email, $password, $role);
+        Header("Location:Login.php");
+    }
 }
 
-if (!$fNameCheck && !$lNameCheck && !$emailCheck && !$passwordCheck) {
-    $_COOKIE['fName'] = $_POST["fName"];
-    $_COOKIE['lName'] = $_POST["lName"];
-    $_COOKIE['email'] = $_POST["email"];
-    $_COOKIE['password'] = $_POST["password"];
-    Register($_POST["fName"], $_POST["lName"], $_POST["email"], $_POST["password"], $_POST["formRoles"]);
-    header('Location:Login.php');
-}
 ob_flush();
 ?>
-
 
 <form method="post" class="form-register" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
@@ -65,10 +56,18 @@ ob_flush();
     </div>
 
     <div class="form-group">
+
         <label for="Email" class="sr-only">Email</label>
         <input name="email" class="form-control" type="email" id="email" placeholder="Email" required>
     </div>
 
+    <?php if (!empty($emailError)) {
+        echo "        
+        <div class='alert alert-warning'>
+            <strong>Warning!</strong> This email already exists.
+        </div>
+        ";
+    } ?>
 
     <div class="form-group">
         <label for="password" class="sr-only">Password</label>
@@ -76,7 +75,7 @@ ob_flush();
     </div>
 
     <div class="form-group">
-        <select name ="formRoles" class="custom-select custom-select-lg mb-3">
+        <select name="formRoles" class="custom-select custom-select-lg mb-3">
             <option value="employee">Employee</option>
             <option value="manager">Manager</option>
             <option value="salesAssociate">Sales Associate</option>
