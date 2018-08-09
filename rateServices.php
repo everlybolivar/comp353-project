@@ -19,7 +19,7 @@ ob_start();
 
     $clientEmail = $_COOKIE['email'];
 
-    if (!$clientEmail) {
+    if (!$clientID) {
         header('Location:Login.php');
     }
 
