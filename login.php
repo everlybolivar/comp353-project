@@ -1,16 +1,5 @@
 <?php
 ob_start();  //begin buffering the output
-
-function abspath()
-{
-    return $_SERVER['DOCUMENT_ROOT'];
-}
-
-function directory()
-{
-    return '/Admin/';
-}
-
 ?>
 <html>
 

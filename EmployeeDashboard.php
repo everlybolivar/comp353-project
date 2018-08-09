@@ -3,15 +3,6 @@ ob_start();  //begin buffering the output
 ?>
 <html>
 
-<style>
-    .contract-type {
-        padding-top: 20px;
-    }
-
-    .table td {
-        text-align: center;
-    }
-</style>
 <head>
 
     <meta charset="utf-8">
@@ -20,7 +11,7 @@ ob_start();  //begin buffering the output
     <title>Contract CMS</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    <link href="css/employeeDashboard.css" rel="stylesheet">
 </head>
 
 
@@ -39,8 +30,12 @@ if (!$employeeID) {
     header('Location:Login.php');
 }
 
-$query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id WHERE employee.employee_id = '$employeeID'";
-$contract = DB::getInstance()->getResult($query);
+function getContract()
+{
+    $query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id 
+              WHERE employee.employee_id = '$_COOKIE[employeeID]'";
+    return DB::getInstance()->getResult($query);
+}
 
 $query = "SELECT * FROM employee WHERE employee_id = '$employeeID'";
 $employee = DB::getInstance()->getResult($query);
@@ -61,6 +56,26 @@ function changeInsurancePlan($insurance)
     $query = "UPDATE employee SET employee_insurance_plan = '$insurance' WHERE employee_id = '$_COOKIE[employeeID]'";
     DB::getInstance()->dbquery($query);
     header("Refresh:0");
+}
+
+function logHours($hours)
+{
+    $contract = getContract();
+    if ($contract) {
+        $queryCurrentHours = "SELECT hours FROM taskHours WHERE employee_id = '$_COOKIE[employeeID]' 
+                              AND contract_id = '$contract[contract_id]'";
+        echo $queryCurrentHours;
+//        $result = DB::getInstance()->getResult($queryCurrentHours);
+//        $currentHours = $result['hours'];
+
+//        $newHours = $currentHours + $hours;
+        $newHours = 65;
+
+        $query = "UPDATE taskHours SET hours = $newHours WHERE employee_id = '$_COOKIE[employeeID]' 
+                  AND contract_id = '$contract[contract_id]'";
+        echo $query;
+    }
+
 }
 
 if (array_key_exists('Premium', $_POST)) {
@@ -91,6 +106,16 @@ if (array_key_exists('Normal-Insurance', $_POST)) {
     changeInsurancePlan('Normal');
 }
 
+if (array_key_exists('log', $_POST)) {
+   logHours($_POST['hours']);
+}
+
+if (array_key_exists('view-contract', $_POST)) {
+    header('Location:EmployeeContracts.php');
+
+}
+
+
 ob_flush();
 ?>
 
@@ -105,13 +130,16 @@ ob_flush();
                 </thead>
                 <tbody>
                 <tr>
-                    <th scope="row">Contract Type</th>
+                    <th scope="row">Contract Type Preference</th>
                     <td><?php echo $employee["employee_contract_type"] ?></td>
                 </tr>
                 <tr>
                     <th scope="row">Current Contract</th>
-                    <td>Current
-                        Contract: <?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></td>
+                    <td><?php echo getContract()["company_name"] . " (" . getContract()["contract_type"] . ")" ?></td>
+                </tr>
+                <tr>
+                    <th scope="row">Hours</th>
+                    <td>30</td>
                 </tr>
                 <tr>
                     <th scope="row">Insurance Plan</th>
@@ -126,6 +154,20 @@ ob_flush();
 
         </div>
     </div>
+
+    <div class="row">
+        <form class="form-inline" method="post">
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="hours" class="sr-only">Hours</label>
+                <input type="number" min="0" step="0.1" class="form-control" name="hours" placeholder="Log additional hours"/>
+            </div>
+            <button type="submit" name="log" class="btn btn-primary mb-2">Log</button>
+            <button type="submit" name="view-contract" class="btn btn-info mb-2 view-contract">View Contracts</button>
+
+        </form>
+
+    </div>
+
 </div>
 
 <div class="container contract-type">
