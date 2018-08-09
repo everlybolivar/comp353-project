@@ -30,12 +30,18 @@ if (!$employeeID) {
     header('Location:Login.php');
 }
 
-function getContract()
+
+function getCurrentContract()
 {
     $query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id 
               WHERE employee.employee_id = '$_COOKIE[employeeID]'";
     return DB::getInstance()->getResult($query);
 }
+
+$query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id 
+              WHERE employee.employee_id = '$_COOKIE[employeeID]'";
+$contract = DB::getInstance()->getResult($query);
+
 
 $query = "SELECT * FROM employee WHERE employee_id = '$employeeID'";
 $employee = DB::getInstance()->getResult($query);
@@ -60,20 +66,18 @@ function changeInsurancePlan($insurance)
 
 function logHours($hours)
 {
-    $contract = getContract();
+    $contract = getCurrentContract();
     if ($contract) {
-        $queryCurrentHours = "SELECT hours FROM taskHours WHERE employee_id = '$_COOKIE[employeeID]' 
+        $queryCurrentHours = "SELECT hours FROM tasks WHERE employee_id = '$_COOKIE[employeeID]' 
                               AND contract_id = '$contract[contract_id]'";
-        echo $queryCurrentHours;
-//        $result = DB::getInstance()->getResult($queryCurrentHours);
-//        $currentHours = $result['hours'];
+        $result = DB::getInstance()->getResult($queryCurrentHours);
+        $currentHours = $result['hours'];
 
-//        $newHours = $currentHours + $hours;
-        $newHours = 65;
+        $newHours = $currentHours + $hours;
 
-        $query = "UPDATE taskHours SET hours = $newHours WHERE employee_id = '$_COOKIE[employeeID]' 
+        $query = "UPDATE tasks SET hours = $newHours WHERE employee_id = '$_COOKIE[employeeID]' 
                   AND contract_id = '$contract[contract_id]'";
-        echo $query;
+        DB::getInstance()->dbquery($query);
     }
 
 }
@@ -107,7 +111,7 @@ if (array_key_exists('Normal-Insurance', $_POST)) {
 }
 
 if (array_key_exists('log', $_POST)) {
-   logHours($_POST['hours']);
+    logHours($_POST['hours']);
 }
 
 if (array_key_exists('view-contract', $_POST)) {
@@ -135,7 +139,7 @@ ob_flush();
                 </tr>
                 <tr>
                     <th scope="row">Current Contract</th>
-                    <td><?php echo getContract()["company_name"] . " (" . getContract()["contract_type"] . ")" ?></td>
+                    <td><?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></td>
                 </tr>
                 <tr>
                     <th scope="row">Hours</th>
@@ -159,7 +163,8 @@ ob_flush();
         <form class="form-inline" method="post">
             <div class="form-group mx-sm-3 mb-2">
                 <label for="hours" class="sr-only">Hours</label>
-                <input type="number" min="0" step="0.1" class="form-control" name="hours" placeholder="Log additional hours"/>
+                <input type="number" min="0" step="0.1" class="form-control" name="hours"
+                       placeholder="Log additional hours"/>
             </div>
             <button type="submit" name="log" class="btn btn-primary mb-2">Log</button>
             <button type="submit" name="view-contract" class="btn btn-info mb-2 view-contract">View Contracts</button>

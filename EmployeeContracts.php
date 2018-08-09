@@ -28,15 +28,24 @@ if (!$employeeID) {
     header('Location:Login.php');
 }
 
-function getContract()
+function getCurrentContract()
 {
     $query = "SELECT * FROM contract INNER JOIN employee ON contract.contract_id = employee.contract_id 
               WHERE employee.employee_id = '$_COOKIE[employeeID]'";
     return DB::getInstance()->getResult($query);
 }
 
-// Get all contracts employee has worked on in table TASKS
+function getEmployee()
+{
+    $query = "SELECT * FROM employee WHERE employee_id = '$_COOKIE[employeeID]'";
+    return DB::getInstance()->getResult($query);
+}
 
+
+$query = "SELECT *, tasks.contract_id as task_contract_id FROM tasks INNER JOIN contract ON tasks.contract_id = contract.contract_id 
+          INNER JOIN employee ON contract.responsible_person_id = employee.employee_id
+              WHERE tasks.employee_id = $_COOKIE[employeeID]";
+$result = DB::getConnection()->query($query); // All contracts that employee has worked on
 
 ob_flush();
 ?>
@@ -44,7 +53,8 @@ ob_flush();
 <div class="container">
     <div class="row">
         <div style='width:20%; margin:0 auto;' class='card-body'>
-            <h2 class='card-title'>All Contracts</h2>
+            <h2 class='card-title'><?php echo getEmployee()['employee_fname'] . " " . getEmployee()['employee_lname'] ?>
+                's Contracts</h2>
         </div>
         <div style='padding-left:20px ;'>
             <table class='table table-striped'>
@@ -57,6 +67,19 @@ ob_flush();
                     <th>Service End Date</th>
                     <th>Hours Worked</th>
                 </tr>
+                <?php
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    echo "<td>" . $row['task_contract_id'] . "</td>";
+                    echo "<td>" . $row['contract_type'] . "</td>";
+                    echo "<td>" . $row['service_type'] . "</td>";
+                    echo "<td>" . $row['employee_fname'] . " ". $row['employee_lname'] . "</td>";
+                    echo "<td>" . $row['service_start_date'] . '</td>';
+                    echo "<td>" . $row['service_end_date'] . "</td>";
+                    echo "<td>" . $row["hours"] . "</td>";
+                    echo "</tr>";
+                }
+                ?>
             </table>
         </div>
     </div>
