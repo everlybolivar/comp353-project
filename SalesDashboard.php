@@ -39,7 +39,6 @@
     //Set service_end_date based on the contract selected
     if ($contract_type === 'Premium') { //Premium Contract
 		$service_end_date = date('Y-m-d', strtotime($Date. ' + 10 days'));
-
 		$first_deliverable = date('Y-m-d', strtotime($Date. ' + 3 days'));
 	    $second_deliverable = date('Y-m-d', strtotime($Date. ' + 5 days'));
 	    $third_deliverable = date('Y-m-d', strtotime($Date. ' + 10 days'));
@@ -47,7 +46,6 @@
 
     } else if ($contract_type === 'Diamond') { //Diamond Contract
 		$service_end_date = date('Y-m-d', strtotime($Date. ' + 18 days'));
-
 		$first_deliverable = date('Y-m-d', strtotime($Date. ' + 6 days'));
 	    $second_deliverable = date('Y-m-d', strtotime($Date. ' + 11 days'));
 	    $third_deliverable = date('Y-m-d', strtotime($Date. ' + 18 days'));
@@ -55,7 +53,6 @@
 
     } else if ($contract_type === 'Gold') { //Gold Contract
     	$service_end_date = date('Y-m-d', strtotime($Date. ' + 20 days'));
-
     	$first_deliverable = date('Y-m-d', strtotime($Date. ' + 8 days'));
 	    $second_deliverable = date('Y-m-d', strtotime($Date. ' + 14 days'));
 	    $third_deliverable = date('Y-m-d', strtotime($Date. ' + 20 days'));
@@ -63,7 +60,6 @@
 
     } else if ($contract_type === 'Silver') { //Silver Contract
     	$service_end_date = date('Y-m-d', strtotime($Date. ' + 28 days'));
-    	
     	$first_deliverable = date('Y-m-d', strtotime($Date. ' + 5 days'));
 	    $second_deliverable = date('Y-m-d', strtotime($Date. ' + 15 days'));
 	    $third_deliverable = date('Y-m-d', strtotime($Date. ' + 20 days'));
@@ -72,28 +68,10 @@
     
 
     if (is_null($fourth_deliverable)) {
-    	$query = "INSERT INTO contract (
-									    company_name,
-									    service_type, 
-									    service_start_date,
-									    first_deliverable,
-									    second_deliverable,
-									    third_deliverable,
-									    fourth_deliverable,
-									    service_end_date,
-									    contract_type,
-									    acv,  
-									    initial_cost,
-									    responsible_person_id,
-								        contact_number, 
-								        email_id, 
-								        address,
-								        province,
-				 				        city,
-				   			            postal_code
-									) 
-			         		
-			         		VALUES  (
+    	
+    	$query = "INSERT INTO contract (company_name, service_type, service_start_date, first_deliverable, second_deliverable, third_deliverable, fourth_deliverable, service_end_date, contract_type, acv, initial_cost, responsible_person_id, 
+	                                    contact_number, email_id, address, province, city, postal_code) 
+			      VALUES (
 			         					'$company_name',
 							            '$service_type',
 							            '$service_start_date',
@@ -112,29 +90,11 @@
 							            '$province', 
 							            '$city', 
 							            '$postal_code' 
-							        )
-	";
+							        )";
     } else { 
-    	$query = "INSERT INTO contract (
-									    company_name,
-									    service_type, 
-									    service_start_date,
-									    first_deliverable,
-									    second_deliverable,
-									    third_deliverable,
-									    fourth_deliverable,
-									    service_end_date,
-									    contract_type,
-									    acv,  
-									    initial_cost,
-									    responsible_person_id,
-								        contact_number, 
-								        email_id, 
-								        address,
-								        province,
-				 				        city,
-				   			            postal_code
-									) 
+    	
+    	$query = "INSERT INTO contract (company_name, service_type, service_start_date, first_deliverable, second_deliverable, third_deliverable, fourth_deliverable, service_end_date, contract_type, acv, initial_cost, responsible_person_id, 
+	                                    contact_number, email_id, address, province, city, postal_code) 
 			         		
 			         		VALUES  (
 			         					'$company_name',
@@ -155,8 +115,7 @@
 							            '$province', 
 							            '$city', 
 							            '$postal_code' 
-							        )
-	";
+							        )";
     }
     
 	
@@ -164,7 +123,7 @@
 	   	if ($connection->query($query) === TRUE) {
     		echo "New record created successfully";
 		} else {
-	    	echo "Error: " . $query . "<br>" . $connection->error;
+	    	echo "Error: " . $connection->error . "<br>";
 		}
 	}   
 
@@ -177,173 +136,10 @@
 
 ?>
 
-
 <!DOCTYPE html>
 <html>
 	<head>
-		<style>
-			@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
-
-		body {
-		  font-family: "Roboto", helvetica, arial, sans-serif;
-		  font-size: 16px;
-		  font-weight: 400;
-		  text-rendering: optimizeLegibility;
-		}
-
-		table.center {
-	    	margin-left:auto; 
-	    	margin-right:auto;
-  		}
-
-  		.centerThis {
-  			text-align: center;
-  		}
-
-  		input[type=submit] {
-		    padding:5px 15px; 
-		    background:#ccc; 
-		    border:0 none;
-		    cursor:pointer;
-		    -webkit-border-radius: 5px;
-		    border-radius: 5px; 
-		}
-
-		div.table-title {
-	    	display: block;
-			margin: auto;
-			max-width: 600px;
-			padding:5px;
-			width: 100%;
-		}
-
-		.table-title h3 {
-		   color: #fafafa;
-		   font-size: 30px;
-		   font-weight: 400;
-		   font-style:normal;
-		   font-family: "Roboto", helvetica, arial, sans-serif;
-		   text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-		   text-transform:uppercase;
-		}
-
-
-		/*** Table Styles **/
-
-		.table-fill {
-		  background: white;
-		  border-radius:3px;
-		  border-collapse: collapse;
-		  height: 320px;
-		  margin: auto;
-		  max-width: 600px;
-		  padding:5px;
-		  width: 100%;
-		  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-		  animation: float 5s infinite;
-		}
-		 
-		th {
-		  color:#D5DDE5;;
-		  background:#1b1e24;
-		  border-bottom:4px solid #9ea7af;
-		  border-right: 1px solid #343a45;
-		  font-size:23px;
-		  font-weight: 100;
-		  padding:24px;
-		  text-align:left;
-		  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-		  vertical-align:middle;
-		}
-
-		th:first-child {
-		  border-top-left-radius:3px;
-		}
-		 
-		th:last-child {
-		  border-top-right-radius:3px;
-		  border-right:none;
-		}
-		  
-		tr {
-		  border-top: 1px solid #C1C3D1;
-		  border-bottom-: 1px solid #C1C3D1;
-		  color:#666B85;
-		  font-size:16px;
-		  font-weight:normal;
-		  text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
-		}
-		 
-		tr:hover td {
-		  background:#4E5066;
-		  color:#FFFFFF;
-		  border-top: 1px solid #22262e;
-		}
-		 
-		tr:first-child {
-		  border-top:none;
-		}
-
-		tr:last-child {
-		  border-bottom:none;
-		}
-		 
-		tr:nth-child(odd) td {
-		  background:#EBEBEB;
-		}
-		 
-		tr:nth-child(odd):hover td {
-		  background:#4E5066;
-		}
-
-		tr:last-child td:first-child {
-		  border-bottom-left-radius:3px;
-		}
-		 
-		tr:last-child td:last-child {
-		  border-bottom-right-radius:3px;
-		}
-		 
-		td {
-		  background:#FFFFFF;
-		  padding:20px;
-		  text-align:left;
-		  vertical-align:middle;
-		  font-weight:300;
-		  font-size:18px;
-		  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-		  border-right: 1px solid #C1C3D1;
-		}
-
-		td:last-child {
-		  border-right: 0px;
-		}
-
-		th.text-left {
-		  text-align: left;
-		}
-
-		th.text-center {
-		  text-align: center;
-		}
-
-		th.text-right {
-		  text-align: right;
-		}
-
-		td.text-left {
-		  text-align: left;
-		}
-
-		td.text-center {
-		  text-align: center;
-		}
-
-		td.text-right {
-		  text-align: right;
-		}
-
-		</style>
+		<link href="css/salesdashboard.css" rel="stylesheet">
 	</head>
 	<body onload="document.createContract.reset();">
 		<div class="centerThis">
