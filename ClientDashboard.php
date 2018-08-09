@@ -16,7 +16,7 @@ ob_start();
     <?php 
     require 'DB.php';
     $connection = DB::getConnection();
-    //pls
+
     $clientEmail = $_COOKIE['email'];
     $clientID = $_COOKIE['clientID'];
 

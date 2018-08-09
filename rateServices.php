@@ -18,6 +18,7 @@ ob_start();
     $connection = DB::getConnection();
 
     $clientEmail = $_COOKIE['email'];
+    $clientID = $_COOKIE['clientID'];
 
     if (!$clientID) {
         header('Location:Login.php');
