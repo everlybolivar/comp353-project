@@ -84,7 +84,7 @@ function directory()
                     $sql = $sql->fetch();
 
                     if($clientEmail == $email) {
-                        setcookie("clientID", $employeeID, time() + (86400 * 30));
+                        setcookie("clientID", time() + (86400 * 30));
                         header('Location:ClientDashboard.php');
                         exit();
                     } else {
