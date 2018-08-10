@@ -108,6 +108,16 @@ if (isset($_GET['id'])) {
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
+
+        $sql1 = $connection->prepare("SELECT SUM(hours) FROM tasks WHERE tasks.contract_id = ?;");
+        //bind params bind the email question mark. Refer to SQL prepared statements;
+        $sql1->bind_param("s", $cid);
+        $sql1->execute();
+        $sql1->bind_result($contracthours);
+        $sql1->fetch();
+        $sql1->close();
+
+
         $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id FROM contract WHERE contract.contract_id = ?");
         //bind params bind the email question mark. Refer to SQL prepared statements;
         $sql1->bind_param("s", $cid);
@@ -115,7 +125,6 @@ if (isset($_GET['id'])) {
         $sql1->bind_result($contractname, $contractid);
         $sql1->fetch();
         $sql1->close();
-
 
         //find users for manager to add
         $sql2 = $connection->prepare("SELECT employee.employee_fname,employee.employee_lname,employee.employee_id  FROM users INNER JOIN employee ON employee.manager_id = users.employee_id INNER JOIN contract on contract.contract_type = employee.employee_contract_type WHERE users.email = ? && contract.contract_id = ? && employee.contract_id is NULL;");
@@ -182,6 +191,8 @@ ob_flush();
                 <?php echo $contractname ?>
             </div>
             <ul class="list-group list-group-flush">
+                <p><?php echo "Hours worked" . $contracthours ?></p>
+                <p><?php echo "Number of Employees " . $rowNum ?></p>
                 <?php while ($row = $result->fetch_assoc()) { ?>
                     <li class="list-group-item">
                         <div class="row">
@@ -189,14 +200,6 @@ ob_flush();
                                 <?php echo $row['employee_fname'] . $row['employee_lname'] ?>
                             </div>
                             <!--makes it so that this form posts back to itself. Refer to php forms-->
-                            <form method="post"
-                                  action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id=" . $contractid); ?>">
-                                <div class="col-sm-6">
-                                    <input type='hidden' name='eid' value= <?php echo $row['employee_id'] ?>>
-                                    <button type="submit" class="btn btn-primary"> Remove</button>
-                                </div>
-                            </form>
-
                         </div>
                     </li>
                 <?php } ?>
@@ -206,14 +209,7 @@ ob_flush();
 
 
         </div>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id=" . $contractid); ?>">
-            <select name="addEid">
-                <?php while ($row2 = $resultEmployee->fetch_assoc()) { ?>
-                    <option value= <? echo $row2['employee_id'] ?>> <? echo $row2['employee_id'] . " " . $row2['employee_lname'] ?> </option>
-                <?php } ?>
-            </select>
-            <button type="submit" class="btn btn-primary"> Add employees</button>
-        </form>
+
 
     </div>
 </div>
