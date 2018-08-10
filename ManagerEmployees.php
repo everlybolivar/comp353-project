@@ -70,6 +70,15 @@ $password = '353DBpro';
 $db = 'ddc353_1';
 $db_port = '3306';
 
+
+$sales= $_COOKIE['manager'];
+
+// Redirect to login if no employee cookie
+if (!$sales) {
+    header('Location:Login.php');
+}
+
+
 $connection = mysqli_connect($host, $username, $password, $db, $db_port);
 if ($connection->connect_error) {
     die("error failure" . $connection->connect_error);

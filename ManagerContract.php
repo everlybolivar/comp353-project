@@ -63,6 +63,13 @@ ob_start();  //begin buffering the output
 require 'DB.php';
 //validation
 
+$sales= $_COOKIE['manager'];
+
+// Redirect to login if no employee cookie
+if (!$sales) {
+    header('Location:Login.php');
+}
+
 
 //removes employee from contract
 if (isset($_POST['eid'])) {

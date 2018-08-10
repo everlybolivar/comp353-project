@@ -94,6 +94,7 @@ ob_start();  //begin buffering the output
                         header('Location:EmployeeDashboard.php');
                         exit();
                     } else if ($out == 1) {
+                        setcookie("manager", $employeeID, time() + (86400 * 30));
                         header('Location:ManagerDashboard.php');
                         exit();
                     } else if ($out == 13) {
