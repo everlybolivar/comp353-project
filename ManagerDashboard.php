@@ -62,13 +62,9 @@ ob_start();  //begin buffering the output
 <?php
 require 'DB.php';
 //validation
+
 //read user email
 $email = $_COOKIE['email'];
-$host = 'ddc353.encs.concordia.ca';
-$username = 'ddc353_1';
-$password = '353DBpro';
-$db = 'ddc353_1';
-$db_port = '3306';
 
 if (isset($_POST['filter'])) {
     $filter = $_POST['filter'];
@@ -96,12 +92,14 @@ if (isset($_POST['filter'])) {
             $sql1->fetch();
             $sql1->close();
 
+
         }
 
 
     }
 
 } else {
+
 
     $connection = mysqli_connect($host, $username, $password, $db, $db_port);
     if ($connection->connect_error) {
@@ -116,7 +114,6 @@ if (isset($_POST['filter'])) {
         $resultContract = $sql1->get_result();
         $sql1->fetch();
         $sql1->close();
-
     }
 }
 
