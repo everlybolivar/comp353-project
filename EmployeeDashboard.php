@@ -64,6 +64,11 @@ function changeInsurancePlan($insurance)
     header("Refresh:0");
 }
 
+function getHoursOnCurrentContract()
+{
+    $query = "SELECT hours from contract INNER JOIN tasks ON tasks.contract_id = " . getCurrentContract()['contract_id'];
+    return DB::getInstance()->getResult($query);
+}
 function logHours($hours)
 {
     $contract = getCurrentContract();
@@ -142,8 +147,8 @@ ob_flush();
                     <td><?php echo $contract["company_name"] . " (" . $contract["contract_type"] . ")" ?></td>
                 </tr>
                 <tr>
-                    <th scope="row">Hours</th>
-                    <td>30</td>
+                    <th scope="row">Hours Worked</th>
+                    <td><?php echo getHoursOnCurrentContract()['hours']?></td>
                 </tr>
                 <tr>
                     <th scope="row">Insurance Plan</th>
