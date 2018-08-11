@@ -29,25 +29,37 @@ ob_start();
     $company = $client["company_name"];
 
     $contractID = $_GET['id'];
-    $sql2 = "SELECT * FROM contract WHERE contract_id = '$contractID'";
-    $contract = DB::getInstance()->getResult($sql2);
 
-    $managerID = $contract["responsible_person_id"]; 
-    $sql3 = "SELECT employee_fname, employee_lname FROM employee WHERE employee_id = '$managerID'";
-    $manager = DB::getInstance()->getResult($sql3);
+    $amt = $_POST['amt'];
+    $date = DATE("Y-m-d");
+    $query = "INSERT INTO payment (contract_id, amount, payee, payment_date)
+    VALUES ('$contractID', '$amt', '$company', '$date')";
 
-    $clientrate = $_POST['rating'];
-    $query = "INSERT INTO ratings (contract_worked, manager_rated, rate)
-    VALUES ($contractID, $managerID, $clientrate)";
-
-    $confirmation = true;
-    if (isset($_POST['submit_rating'] ) ) {
-        if ($connection->query($query) === FALSE) {
-            $confirmation = false ;
+    $confirmation = FALSE;
+    $fail = FALSE;
+    if (isset($_POST['submit_pay'])) {
+        if ($connection->query($query) === TRUE) {
+            $confirmation = TRUE ;
         } else {
-            echo "Problem with rating.";
+            $fail = TRUE;
         }
-    } 
+    }
+
+
+    function getBalance() {
+        $contractID = $_GET['id'];
+        $sql2 = "SELECT acv+initial_cost FROM contract AS totalcost WHERE contract_id = '$contractID'";
+        $contract = DB::getInstance()->getResult($sql2);
+        $totalcost = $contract['acv+initial_cost'];
+
+        $sql3 = "SELECT SUM(amount) from payment WHERE contract_id = '$contractID'";
+        $payment = DB::getInstance()->getResult($sql3);
+        $amtpaid = $payment['SUM(amount)'];
+
+        $balance = $totalcost - $amtpaid;
+        return $balance;
+    }
+
 
     ob_flush();
     ?>
@@ -60,15 +72,41 @@ ob_start();
         <nav class="navbar navbar-inverse">
           <div class="container-fluid">
             <ul class="nav navbar-nav">
-              <li class="dropdown"><a href="ClientDashboard.php">Contracts</a></li>
-              <li class="active"><a href="Rating.php">Management Review</a></li>
+              <li class="active"><a href="ClientDashboard.php">Contracts</a></li>
+              <li class="dropdown"><a href="Rating.php">Management Review</a></li>
           </ul>
       </div>
   </nav>
 
   <div class ="section-container">
-     <h2>Get yo payments hur'</h2>  
-
+    <h2>Contract Payments</h2>
+    <form method="POST" class="form-inline">
+        <?php 
+        echo '<div class="container-fluid">';
+        if (getBalance() == 0) {
+            echo '<p> You have already paid off this contract. </p>';
+        } else {
+            echo '<p> You have a remaining balance of $' . getBalance() . ' for contract ' . $contractID . '.';
+            echo '
+            <div class="form-group">
+            <label for="amount">Amount to pay: </label>
+            <input type="text" class="form-control" name="amt" placeholder="Enter Amount">
+            <p><br><input type="submit" class="btn btn-default" name="submit_pay" value="Submit Payment"/></p>
+            </div>';
+            if ($fail) {
+                echo '<div class="alert alert-danger" role="alert">
+                Problem with payment.
+                </div>';
+            }
+            if ($confirmation){
+                echo '<div class="alert alert-success">
+                <strong>Success!</strong> Payment confirmed.
+                </div>';
+            }         
+        }
+        echo '</div>';
+        ?>
+    </form>
 </div>
 </div>
 
