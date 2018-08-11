@@ -67,30 +67,8 @@ ob_start();
   </nav>
 
   <div class ="section-container">
-     <h2>Rate Services</h2>  
-     <p> 
-        You are rating <?php echo $manager['employee_fname'] . " " . $manager['employee_lname'] ?>'s Services for the work done on contract <?php echo $contractID ?>. 
-        <br><br>
-        <h4>Please select a rating between 1 (lowest) to 10 (highest).</h4>
-        <form method = "POST">
-            <label class="radio-inline"><input type="radio" name="rating" value="1">1</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="2">2</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="3">3</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="4">4</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="5">5</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="6">6</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="7">7</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="8">8</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="9">9</label>
-            <label class="radio-inline"><input type="radio" name="rating" value="10">10</label>
-            <p><br><input type="submit" class='btn btn-default' name="submit_rating" value="Submit Rating"/></p>
-            <?php if (!$confirmation): ?>
-                <div class="alert alert-danger" role="alert">
-                    You have already reviewed this service.
-                </div>
-            <?php endif; ?>
-        </form>
-    </p>
+     <h2>Get yo payments hur'</h2>  
+
 </div>
 </div>
 
