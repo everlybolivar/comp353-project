@@ -61,23 +61,24 @@ ob_start();  //begin buffering the output
 <!---->
 <?php
 require 'DB.php';
+include 'Nav.php';
 //validation
 
+$connection = DB::getConnection();
 
-$sales= $_COOKIE['manager'];
+$employeeID= $_COOKIE['employeeID'];
 
 // Redirect to login if no employee cookie
-if (!$sales) {
+if (!$employeeID) {
     header('Location:Login.php');
 }
-
 
 //read user email
 $email = $_COOKIE['email'];
 
 if (isset($_POST['filter'])) {
     $filter = $_POST['filter'];
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
@@ -91,7 +92,6 @@ if (isset($_POST['filter'])) {
             $sql1->fetch();
             $sql1->close();
         } else {
-
             //find  contracts name and id
             $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id,contract.service_start_date,contract.service_end_date,contract.responsible_person_id,employee.employee_fname,employee.employee_lname FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.employee_id = contract.responsible_person_id WHERE users.email = ? ORDER BY service_start_date ASC");
             //bind params bind the email question mark. Refer to SQL prepared statements;
@@ -100,17 +100,11 @@ if (isset($_POST['filter'])) {
             $resultContract = $sql1->get_result();
             $sql1->fetch();
             $sql1->close();
-
-
         }
-
-
     }
 
 } else {
-
-
-    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    $connection = DB::getConnection();
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
@@ -131,13 +125,6 @@ ob_flush();
 
 ?>
 
-
-<!--<div class="sidebar">-->
-<!--    <div class="title">CMS</div>-->
-<!--    <div class="lielement"> <a>test</a></div>-->
-<!--    <div class="lielement"><a>test2</a></div>-->
-<!---->
-<!--</div>-->
 <div id="content">
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <div class="form-group">
@@ -222,3 +209,4 @@ ob_flush();
         crossorigin="anonymous"></script>
 
 </html>
+

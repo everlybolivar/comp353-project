@@ -1,5 +1,5 @@
 <?php
-ob_start();  
+ob_start();
 ?>
 <html>
 
@@ -13,7 +13,7 @@ ob_start();
 
 <body>
 
-    <?php 
+    <?php
     require 'DB.php';
     $connection = DB::getConnection();
 
