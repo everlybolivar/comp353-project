@@ -63,86 +63,68 @@ ob_start();  //begin buffering the output
 require 'DB.php';
 //validation
 
-//removes employee from contract
-if (isset($_POST['eid'])) {
-    $eid = $_POST['eid'];
 
-    $connection = DB::getConnection();
+$sales= $_COOKIE['manager'];
 
-    if ($connection->connect_error) {
-        die("error failure" . $connection->connect_error);
-    } else {
-        $sql3 = $connection->prepare("UPDATE employee SET contract_id = NULL where employee_id = ?");
-        $sql3->bind_param("s", $eid);
-        $sql3->execute();
-    }
-
-    $sql3->close();
-    Header('Location: ' . $_SERVER['PHP_SELF']);
-    Exit();
-
+// Redirect to login if no employee cookie
+if (!$sales) {
+    header('Location:Login.php');
 }
 
 
 //read user email
 $email = $_COOKIE['email'];
 
-// Redirect to login if no employee cookie
-if (!$email) {
-    header('Location:Login.php');
-}
-
-$connection = DB::getConnection();
-
-if ($connection->connect_error) {
-    die("error failure" . $connection->connect_error);
-} else {
-
-    //find  contracts name and id
-    $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id WHERE users.email = ?");
-    //bind params bind the email question mark. Refer to SQL prepared statements;
-    $sql1->bind_param("s", $email);
-    $sql1->execute();
-    $sql1->bind_result($contractname, $contractid);
-    $sql1->fetch();
-    $sql1->close();
-
-
-    //find users for manager to add
-    $sql2 = $connection->prepare("SELECT employee.employee_fname,employee.employee_fname,employee.employee_id FROM users INNER JOIN employee ON employee.manager_id = users.employee_id WHERE users.email = ?");
-    $sql2->bind_param("s", $email);
-    $sql2->execute();
-    $resultEmployee = $sql2->get_result();
-    $sql2->close();
-
-    //find users in contract
-    $sql = $connection->prepare("SELECT employee.employee_id,employee.employee_fname,employee.employee_lname,contract.contract_id,contract.company_name  FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.manager_id = contract.responsible_person_id && employee.contract_id = contract.contract_id WHERE users.email = ?");
-    $sql->bind_param("s", $email);
-    $sql->execute();
-    $result = $sql->get_result();
-    $rowNum = $sql->num_rows;
-
-}
-
-//Checks for employee to be added
-if (isset($_POST['addEid'])) {
-    $addEid = $_POST['addEid'];
-    $connection = DB::getConnection();
-
+if (isset($_POST['filter'])) {
+    $filter = $_POST['filter'];
+    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
     } else {
-        echo "cid" . $contractid . $addEid;
-        $sql4 = $connection->prepare("UPDATE employee SET contract_id = ? WHERE employee_id = ?");
-        $sql4->bind_param("ss", $contractid, $addEid);
-        $sql4->execute();
-        Header('Location: ' . $_SERVER['PHP_SELF']);
-        Exit();
+        if ($filter != 'All') {
+            //find  contracts name and id
+            $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id,contract.service_start_date,contract.service_end_date,contract.responsible_person_id,employee.employee_fname,employee.employee_lname FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.employee_id = contract.responsible_person_id WHERE users.email = ? && contract.contract_type = ? ORDER BY service_start_date ASC");
+            //bind params bind the email question mark. Refer to SQL prepared statements;
+            $sql1->bind_param("ss", $email, $filter);
+            $sql1->execute();
+            $resultContract = $sql1->get_result();
+            $sql1->fetch();
+            $sql1->close();
+        } else {
+
+            //find  contracts name and id
+            $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id,contract.service_start_date,contract.service_end_date,contract.responsible_person_id,employee.employee_fname,employee.employee_lname FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.employee_id = contract.responsible_person_id WHERE users.email = ? ORDER BY service_start_date ASC");
+            //bind params bind the email question mark. Refer to SQL prepared statements;
+            $sql1->bind_param("s", $email);
+            $sql1->execute();
+            $resultContract = $sql1->get_result();
+            $sql1->fetch();
+            $sql1->close();
+
+
+        }
+
+
+    }
+
+} else {
+
+
+    $connection = mysqli_connect($host, $username, $password, $db, $db_port);
+    if ($connection->connect_error) {
+        die("error failure" . $connection->connect_error);
+    } else {
+
+        //find  contracts name and id
+        $sql1 = $connection->prepare("SELECT contract.company_name,contract.contract_id,contract.service_start_date,contract.service_end_date,contract.responsible_person_id,employee.employee_fname,employee.employee_lname FROM users INNER JOIN contract ON contract.responsible_person_id = users.employee_id INNER JOIN employee ON employee.employee_id = contract.responsible_person_id WHERE users.email = ? ORDER BY service_start_date ASC");
+        //bind params bind the email question mark. Refer to SQL prepared statements;
+        $sql1->bind_param("s", $email);
+        $sql1->execute();
+        $resultContract = $sql1->get_result();
+        $sql1->fetch();
+        $sql1->close();
     }
 }
-
-
-$sql->close();
 
 
 ob_flush();
@@ -157,43 +139,71 @@ ob_flush();
 <!---->
 <!--</div>-->
 <div id="content">
-    <div class="form-group">
-        <div class="card" style="width: 25rem;">
-            <div class="card-header">
-                <?php echo $contractname ?>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-2">
+                    <select name="filter">
+                        <option value="All">ALL</option>
+                        <option value="Diamond">DIAMOND</option>
+                        <option value="Premium">PREMIUM</option>
+                        <option value="Gold">GOLD</option>
+                        <option value="Silver">SILVER</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary"> Sort</button>
+                </div>
             </div>
-            <ul class="list-group list-group-flush">
-                <?php while ($row = $result->fetch_assoc()) { ?>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <?php echo $row['employee_fname'] . $row['employee_lname'] ?>
-                            </div>
-                            <!--makes it so that this form posts back to itself. Refer to php forms-->
-                            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                <div class="col-sm-6">
-                                    <input type='hidden' name='eid' value= <?php echo $row['employee_id'] ?>>
-                                    <button type="submit" class="btn btn-primary"> Remove</button>
-                                </div>
-                            </form>
-
-                        </div>
-                    </li>
-                <?php } ?>
-
-
-            </ul>
-
 
         </div>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <select name="addEid">
-                <?php while ($row2 = $resultEmployee->fetch_assoc()) { ?>
-                    <option value= <? echo $row2['employee_id'] ?>> <? echo $row2['employee_id'] . " " . $row2['employee_lname'] ?> </option>
+    </form>
+    <div class="form-group">
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">Contract ID</th>
+                <th scope="col">Contract Name</th>
+                <th scope="col">Contract manager</th>
+                <th scope="col">Contract start date</th>
+                <th scope="col">Contract end date</th>
+
+                <th scope="col"></th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $resultContract->fetch_assoc()) { ?>
+                <?php if (strtotime($row['service_end_date']) < time() - (60 * 60 * 24)) { ?>
+                    <tr class="table-danger">
+                        <th scope="row"><?php echo $row['contract_id'] ?></th>
+                        <td><?php echo $row['company_name'] ?></td>
+                        <td><?php echo $row['employee_fname'] . " " . $row['employee_lname'] ?></td>
+                        <td><?php echo $row['service_start_date'] ?></td>
+                        <td><?php echo $row['service_end_date'] ?></td>
+
+                        <td><a href="ManagerContract.php?id=<?php echo $row['contract_id']; ?>">Edit</a></td>
+
+                    </tr>
+                <?php } else { ?>
+                    <tr class="table-success">
+                        <th scope="row"><?php echo $row['contract_id'] ?></th>
+                        <td><?php echo $row['company_name'] ?></td>
+                        <td><?php echo $row['employee_fname'] . " " . $row['employee_lname'] ?></td>
+                        <td><?php echo $row['service_start_date'] ?></td>
+                        <td><?php echo $row['service_end_date'] ?></td>
+                        <td><a href="ManagerContract.php?id=<?php echo $row['contract_id']; ?>">Edit</a></td>
+                        <td><a href="ManagerReport.php?id=<?php echo $row['contract_id']; ?>">View Details</a></td>
+
+                    </tr>
                 <?php } ?>
-            </select>
-            <button type="submit" class="btn btn-primary"> Add employees</button>
-        </form>
+
+
+            <?php } ?>
+
+            </tbody>
+        </table>
 
     </div>
 </div>

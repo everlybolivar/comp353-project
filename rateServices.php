@@ -61,7 +61,7 @@ ob_start();
           <div class="container-fluid">
             <ul class="nav navbar-nav">
               <li class="dropdown"><a href="ClientDashboard.php">Contracts</a></li>
-              <li class="active"><a href="Rating.php">Review Management</a></li>
+              <li class="active"><a href="Rating.php">Management Review</a></li>
           </ul>
       </div>
   </nav>
