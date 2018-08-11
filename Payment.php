@@ -24,11 +24,16 @@ ob_start();
         header('Location:Login.php');
     }
 
+
     $sql = "SELECT * FROM contract WHERE email_id = '$clientEmail'";
     $client = DB::getInstance()->getResult($sql);
     $company = $client["company_name"];
 
     $contractID = $_GET['id'];
+
+    if (!$contractID) {
+        header('Location:ClientDashboard.php');
+    }
 
     $amt = $_POST['amt'];
     $date = DATE("Y-m-d");
@@ -81,16 +86,16 @@ ob_start();
   <div class ="section-container">
     <h2>Contract Payments</h2>
     <form method="POST" class="form-inline">
-        <?php 
+        <?php
         echo '<div class="container-fluid">';
-        if (getBalance() == 0) {
+        if (getBalance() <= 0) {
             echo '<p> You have already paid off this contract. </p>';
         } else {
             echo '<p> You have a remaining balance of $' . getBalance() . ' for contract ' . $contractID . '.';
             echo '
             <div class="form-group">
             <label for="amount">Amount to pay: </label>
-            <input type="text" class="form-control" name="amt" placeholder="Enter Amount">
+            <input type="number" min="0" step="0.1" class="form-control" name="amt" placeholder="Enter Amount">
             <p><br><input type="submit" class="btn btn-default" name="submit_pay" value="Submit Payment"/></p>
             </div>';
             if ($fail) {
@@ -98,11 +103,11 @@ ob_start();
                 Problem with payment.
                 </div>';
             }
-            if ($confirmation){
-                echo '<div class="alert alert-success">
+        }
+        if ($confirmation){
+            echo '<div class="alert alert-success">
                 <strong>Success!</strong> Payment confirmed.
                 </div>';
-            }         
         }
         echo '</div>';
         ?>
