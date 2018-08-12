@@ -63,8 +63,14 @@ ob_start();  //begin buffering the output
 require 'DB.php';
 //validation
 
+$connection = DB::getConnection();
 
 $sales= $_COOKIE['manager'];
+$host = 'ddc353.encs.concordia.ca';
+$username = 'ddc353_1';
+$password = '353DBpro';
+$db = 'ddc353_1';
+$db_port = '3306';
 
 // Redirect to login if no employee cookie
 if (!$sales) {
@@ -108,8 +114,6 @@ if (isset($_POST['filter'])) {
     }
 
 } else {
-
-
     $connection = mysqli_connect($host, $username, $password, $db, $db_port);
     if ($connection->connect_error) {
         die("error failure" . $connection->connect_error);
