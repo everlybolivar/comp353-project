@@ -66,6 +66,7 @@ include 'Nav.php';
 
 $connection = DB::getConnection();
 
+
 $employeeID= $_COOKIE['employeeID'];
 
 // Redirect to login if no employee cookie
