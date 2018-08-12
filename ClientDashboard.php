@@ -31,7 +31,8 @@ ob_start();
     contract.service_type, contract.acv, contract.service_start_date, 
     contract.service_end_date, employee.employee_fname, employee.employee_lname 
     FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
-    WHERE contract.email_id = '$clientEmail' ";
+    WHERE contract.email_id = '$clientEmail'
+    ORDER BY contract.service_start_date ";
     $result = mysqli_query($connection, $query);
 
     function getContracts($type) {
@@ -43,7 +44,8 @@ ob_start();
             contract.service_type, contract.acv, contract.service_start_date, 
             contract.service_end_date, employee.employee_fname, employee.employee_lname 
             FROM contract INNER JOIN employee ON contract.responsible_person_id = employee.employee_id 
-            WHERE contract.email_id = '$clientEmail' ";
+            WHERE contract.email_id = '$clientEmail'
+            ORDER BY contract.service_start_date ";
             break;
 
             case "active":
@@ -53,7 +55,8 @@ ob_start();
             FROM contract 
             INNER JOIN employee 
             ON contract.responsible_person_id = employee.employee_id 
-            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) < DATE(contract.service_end_date)";
+            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) < DATE(contract.service_end_date)
+            ORDER BY contract.service_start_date";
             break;
 
             case "expired":
@@ -63,7 +66,8 @@ ob_start();
             FROM contract 
             INNER JOIN employee 
             ON contract.responsible_person_id = employee.employee_id 
-            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) > DATE(contract.service_end_date)";
+            WHERE contract.email_id = '$clientEmail' && DATE(NOW()) > DATE(contract.service_end_date)
+            ORDER BY contract.service_start_date";
         }
     }
 
@@ -98,7 +102,7 @@ ob_start();
           <div class="container-fluid">
             <ul class="nav navbar-nav">
               <li class="active"><a href="ClientDashboard.php">Contracts</a></li>
-              <li class="dropdown"><a href="Rating.php">Review Management</a></li>
+              <li class="dropdown"><a href="Rating.php">Management Review</a></li>
           </ul>
       </div>
   </nav>
@@ -113,7 +117,7 @@ ob_start();
                 <input type="submit" class='btn btn-default' name="expired" value="View Expired Contracts"/>
             </div>
         </div>
-        
+
         <div class ="section-container">
             <?php 
             if(mysqli_num_rows($result) == 0) {
@@ -128,7 +132,8 @@ ob_start();
                 <th>Supervising Manager</th>
                 <th>Service Start Date</th>
                 <th>Service End Date</th>
-                <th></th>
+                <th>Payment</th>
+                <th>Review</th>
                 </tr>";
                 while($row = mysqli_fetch_array($result)) {
                     echo "<tr>";
@@ -139,8 +144,9 @@ ob_start();
                     echo "<td>" . $row['employee_fname'] . " " . $row['employee_lname'] . "</td>";
                     echo "<td>" . $row['service_start_date'] . '</td>';
                     echo "<td>" . $row['service_end_date'] . "</td>";
+                    echo '<td><center><a href="Payment.php?id=' . $row['contract_id'] . '" class="btn btn-primary" role="button">Pay Contract</a></center></td>';
                     echo '<td>'; 
-                    if($row['service_end_date'] == Null) {
+                    if( DATE("Y-m-d") < $row['service_end_date']) {
                         echo '<button type="button" class="btn btn-default disabled">Contract must be completed before review</button>';
                     } else { 
                         echo '<center><a href="rateServices.php?id=' . $row['contract_id'] . '" class="btn btn-default" role="button">Rate Service</a></center>'; }

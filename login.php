@@ -18,6 +18,11 @@ ob_start();  //begin buffering the output
 
     <?php require 'DB.php';
 
+    setcookie("admin", '', -10);
+    setcookie("employeeID", '', -10);
+    setcookie("manager", '', -10);
+    setcookie("sales", '', -10);
+
     if (isset($_POST['register'])) {
         header("Location:Register.php");
         exit;
@@ -94,7 +99,7 @@ ob_start();  //begin buffering the output
                         header('Location:EmployeeDashboard.php');
                         exit();
                     } else if ($out == 1) {
-                        setcookie("manager", $employeeID, time() + (86400 * 30));
+                        setcookie("employeeID", $employeeID, time() + (86400 * 30));
                         header('Location:ManagerDashboard.php');
                         exit();
                     } else if ($out == 13) {
