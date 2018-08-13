@@ -18,6 +18,13 @@ ob_start();  //begin buffering the output
 
 
 <body>
+<div class="w3-display-topleft">
+    <a href="#"
+       class="btn btn-primary btn-lg active"
+       role="button"
+       aria-pressed="true"
+       onClick="document.location.href='Reports.php'">Back to Reports</a>
+</div>
 
 <?php
 include 'DB.php';
@@ -36,6 +43,11 @@ $query = "SELECT contract.contract_id,
         contract.service_type,
         contract.contract_type,
         contract.service_start_date,    
+        contract.first_deliverable,    
+        contract.second_deliverable,    
+        contract.third_deliverable,    
+        contract.fourth_deliverable,    
+        contract.service_end_date,    
         contract.acv,
         contract.initial_cost,
         employee.employee_fname,
@@ -48,7 +60,7 @@ $query = "SELECT contract.contract_id,
         contract.postal_code
     FROM contract
     INNER JOIN employee ON contract.responsible_person_id = employee.employee_id
-    ORDER BY contract_id";
+    ORDER BY contract.contract_id";
 
 $result = mysqli_query($connection, $query);
 
@@ -64,6 +76,11 @@ echo "<div style='width:20%; margin:0 auto;' class='card-body'>
                <th scope='col'>Service Type</th> 
                <th scope='col'>Contract Type</th> 
                <th scope='col'>Service Start Date</th>
+               <th scope='col'>First Deliverable</th>
+               <th scope='col'>Second Deliverable</th>
+               <th scope='col'>Third Deliverable</th>
+               <th scope='col'>Fourth Deliverable</th>
+               <th scope='col'>Service End Date</th>
                <th scope='col'>ACV</th> 
                <th scope='col'>Initial Cost</th> 
                <th scope='col'>Responsible Person Name</th> 
@@ -85,6 +102,11 @@ while($row = mysqli_fetch_array( $result )) {
     echo '<td>' . $row['service_type'] . '</td>';
     echo '<td>' . $row['contract_type'] . '</td>';
     echo '<td>' . $row['service_start_date'] . '</td>';
+    echo '<td>' . $row['first_deliverable'] . '</td>';
+    echo '<td>' . $row['second_deliverable'] . '</td>';
+    echo '<td>' . $row['third_deliverable'] . '</td>';
+    echo '<td>' . $row['fourth_deliverable'] . '</td>';
+    echo '<td>' . $row['service_end_date'] . '</td>';
     echo '<td>' . $row['acv'] . '$</td>';
     echo '<td>' . $row['initial_cost'] . '$</td>';
     echo '<td>' . $row['employee_fname'] .' '.$row['employee_lname'] . '</td>';
